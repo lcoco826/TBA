@@ -70,6 +70,13 @@ class Game:
     # Process the command entered by the player
     def process_command(self, command_string) -> None:
 
+        # Supprimer les espaces
+        command_string = command_string.strip()
+
+        # Si la commande est vide, ne rien faire
+        if command_string == "":
+            return
+            
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
 
