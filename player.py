@@ -9,7 +9,7 @@ class Player:
     def move(self, direction):
         # Dictionnaire de normalisation des directions
         direction_map = {
-            "N": "N", "NORD": "N", "Nord": "N", "nord": "N",
+            "N": "N", "NORD": "N", "Nord": "N", "nord": "n",
             "S": "S", "SUD": "S", "Sud": "S", "sud": "S",
             "E": "E", "EST": "E", "Est": "E", "est": "E",
             "O": "O", "OUEST": "O", "Ouest": "O", "ouest": "O",
@@ -19,6 +19,7 @@ class Player:
 
         # Normalisation de la direction
         normalized_direction = direction_map.get(direction)
+        print(direction, normalized_direction)
         if normalized_direction is None:
             print(f"\nDirection '{direction}' non reconnue.\n")
             print(self.current_room.get_long_description())
