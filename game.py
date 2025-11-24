@@ -15,7 +15,7 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
-    
+        self.valid_directions = set()
     # Setup the game
     def setup(self):
 
@@ -25,39 +25,48 @@ class Game:
         self.commands["help"] = help
         quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
         self.commands["quit"] = quit
-        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O)", Actions.go, 1)
+        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O,U,D)", Actions.go, 1)
         self.commands["go"] = go
         
         # Setup rooms
 
-        forest = Room("Forest", "une forêt enchantée. Vous entendez une brise légère à travers la cime des arbres.")
+        beach = Room("Beach", "une plage de sable blanc. Vous entendez l'écume grésiller doucement lorsque la vague se brise et se retire sur les galets.")
+        self.rooms.append(beach)
+        cove = Room("Cove", "une crique isolée, perdue entre mer et falaises.")
+        self.rooms.append(cove)
+        forest = Room("Forêt", "une forêt tropicale, dense et humide.")
         self.rooms.append(forest)
-        tower = Room("Tower", "une immense tour en pierre qui s'élève au dessus des nuages.")
-        self.rooms.append(tower)
-        cave = Room("Cave", "une grotte profonde et sombre. Des voix semblent provenir des profondeurs.")
+        lagoon = Room("Lagoon", "la lagune s'étire paisiblement, ses eaux turquoises reflétant le ciel.")
+        self.rooms.append(lagoon)
+        cliff = Room("Cliff", "la falaise, elle se détache sur l'horizon, comme un mur de pierre.")
+        self.rooms.append(cliff)
+        volcano = Room("Volcano", "un volcan, majestueux domine l'île, ses flancs noirs et rugueux témoignent des anciennes coulées de lave.")
+        self.rooms.append(volcano)
+        cave = Room("Cave", "une grotte mystérieuse et sombre se cache derrière la cascade.")
         self.rooms.append(cave)
-        cottage = Room("Cottage", "un petit chalet pittoresque avec un toit de chaume. Une épaisse fumée verte sort de la cheminée.")
-        self.rooms.append(cottage)
-        swamp = Room("Swamp", "un marécage sombre et ténébreux. L'eau bouillonne, les abords sont vaseux.")
-        self.rooms.append(swamp)
-        castle = Room("Castle", "un énorme château fort avec des douves et un pont levis. Sur les tours, des flèches en or massif.")
-        self.rooms.append(castle)
+        waterfall = Room("Waterfall", "la cascade qui dévale la falaise avec fracas, projetant des éclats d'eau créant un nuage de brume.")
+        self.rooms.append(waterfall)
 
         # Create exits for rooms
 
-        forest.exits = {"N" : cave, "E" : None, "S" : castle, "O" : None}
-        tower.exits = {"N" : cottage, "E" : None, "S" : None, "O" : None}
-        cave.exits = {"N" : None, "E" : cottage, "S" : forest, "O" : None}
-        cottage.exits = {"N" : None, "E" : None, "S" : tower, "O" : cave}
-        swamp.exits = {"N" : tower, "E" : None, "S" : None, "O" : castle}
-        castle.exits = {"N" : forest, "E" : swamp, "S" : None, "O" : None}
+        beach.exits = {"N" : forest, "E" : None, "S" : None, "O" : cove}
+        cove.exits = {"N" : lagoon, "E" : beach, "S" : None, "O" : None}
+        forest.exits = {"N" : None, "E" : None, "S" : beach, "O" : lagoon}
+        lagoon.exits = {"N" : cliff, "E" : forest, "S" : cove, "O" : None}
+        cliff.exits = {"U" : cave, "E" : volcano, "D" : lagoon, "O" : None}
+        volcano.exits = {"N" : waterfall, "E" : None, "S" : None, "O" : cliff}
+        cave.exits = {"N" : None, "E" : waterfall, "S" : cliff, "O" : None}
+        waterfall.exits = {"N" : None, "E" : None, "S" : volcano, "O" : cliff}
+
+        for room in self.rooms :
+            self.valid_directions.update([d for d in room.exits.keys() if room.exits[d] is not None])
 
         # Setup player and starting room
 
         self.player = Player(input("\nEntrez votre nom: "))
-        self.player.current_room = swamp
+        self.player.current_room = beach
 
-    # Play the game
+    # Play the gamego
     def play(self):
         self.setup()
         self.print_welcome()
@@ -86,6 +95,13 @@ class Game:
         if command_word not in self.commands.keys():
             print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
         # If the command is recognized, execute it
+        if command_word == "go":
+            if len(list_of_words) < 2:
+                print("Vous devez préciser une direction !")
+                return
+            direction = list_of_words[1]  # <- Le vrai paramètre
+            self.player.move(direction)
+
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)

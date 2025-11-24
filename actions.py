@@ -17,7 +17,6 @@ MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 
 class Actions:
-
     def go(game, list_of_words, number_of_parameters):
         """
         Move the player in the direction specified by the parameter.
