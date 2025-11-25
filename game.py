@@ -49,14 +49,14 @@ class Game:
 
         # Create exits for rooms
 
-        beach.exits = {"N" : forest, "E" : None, "S" : None, "O" : cove}
-        cove.exits = {"N" : lagoon, "E" : beach, "S" : None, "O" : None}
-        forest.exits = {"N" : None, "E" : None, "S" : beach, "O" : lagoon}
-        lagoon.exits = {"N" : cliff, "E" : forest, "S" : cove, "O" : None}
-        cliff.exits = {"U" : cave, "E" : volcano, "D" : lagoon, "O" : None}
-        volcano.exits = {"N" : waterfall, "E" : None, "S" : None, "O" : cliff}
-        cave.exits = {"N" : None, "E" : waterfall, "S" : cliff, "O" : None}
-        waterfall.exits = {"N" : None, "E" : None, "S" : volcano, "O" : cliff}
+        beach.exits = {"N" : forest, "E" : None, "S" : None, "O" : cove, "U" : None, "D": None}
+        cove.exits = {"N" : lagoon, "E" : beach, "S" : None, "O" : None, "U" : None, "D": None}
+        forest.exits = {"N" : None, "E" : None, "S" : beach, "O" : lagoon, "U" : None, "D": None}
+        lagoon.exits = {"N" : cliff, "E" : forest, "S" : cove, "O" : None, "U" : None, "D": None}
+        cave.exits = {"N": None, "E" : volcano, "S" : lagoon, "O" : None, "U" : cliff, "D": None}
+        cliff.exits = {"N": None, "E" : None, "S": None, "O" : None, "U" : None, "D" : cave}
+        volcano.exits = {"N": None, "E" : None, "S": None, "O" : cave, "U" : waterfall, "D" : forest}
+        waterfall.exits = {"N" : None, "E" : None, "S" : None, "O" : None, "U": None, "D": volcano}
 
         for room in self.rooms :
             self.valid_directions.update([d for d in room.exits.keys() if room.exits[d] is not None])

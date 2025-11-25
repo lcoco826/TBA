@@ -11,9 +11,9 @@ class Player:
         direction_map = {
             "N": "N", "NORD": "N", "Nord": "N", "nord": "N", "n": "N",
             "S": "S", "SUD": "S", "Sud": "S", "sud": "S", "s": "S",
-            "E": "E", "EST": "E", "Est": "E", "est": "E", "e": "E"
-            "O": "O", "OUEST": "O", "Ouest": "O", "ouest": "O", "o": "O"
-            "U": "U", "UP": "U", "Up": "U", "up": "U", "u": "U"
+            "E": "E", "EST": "E", "Est": "E", "est": "E", "e": "E",
+            "O": "O", "OUEST": "O", "Ouest": "O", "ouest": "O", "o": "O",
+            "U": "U", "UP": "U", "Up": "U", "up": "U", "u": "U",
             "D": "D", "DOWN": "D", "Down": "D", "down": "D", "d": "D"
         }
 
