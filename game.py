@@ -27,7 +27,9 @@ class Game:
         self.commands["quit"] = quit
         go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O,U,D)", Actions.go, 1)
         self.commands["go"] = go
-        
+        # Dans Game.setup(), après les autres commandes :
+        look = Command("look", " : regarder autour de soi", Actions.look, 0)
+        self.commands["look"] = look
         # Setup rooms
 
         beach = Room("Beach", "une plage de sable blanc. Vous entendez l'écume grésiller doucement lorsque la vague se brise et se retire sur les galets.")
@@ -66,6 +68,51 @@ class Game:
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = beach
 
+        # Dans setup(), après les autres commandes :
+        look = Command("look", " : regarder autour de soi", Actions.look, 0)
+        self.commands["look"] = look
+
+        # Après la section "Create exits for rooms", ajoutez :
+
+        # Import Item at the top of the file
+        from item import Item
+
+        # Add items to rooms (dans la méthode setup())
+        sword = Item("sword", "une épée au fil tranchant comme un rasoir", 2)
+        beach.inventory["sword"] = sword
+
+        potion = Item("potion", "une fiole contenant un liquide verdâtre", 0.5)
+        cove.inventory["potion"] = potion
+
+        map_item = Item("map", "une vieille carte de l'île", 0.1)
+        forest.inventory["map"] = map_item
+
+        rope = Item("rope", "une corde solide et résistante", 1)
+        cave.inventory["rope"] = rope
+
+        torch = Item("torch", "une torche qui éclaire les ténèbres", 0.5)
+        volcano.inventory["torch"] = torch
+
+        take = Command("take", " <item> : prendre un objet", Actions.take, 1)
+        self.commands["take"] = take
+
+        drop = Command("drop", " <item> : déposer un objet", Actions.drop, 1)
+        self.commands["drop"] = drop
+
+        check = Command("check", " : vérifier l'inventaire", Actions.check, 0)
+        self.commands["check"] = check
+
+        charge = Command("charge", " : charger le beamer", Actions.charge, 0)
+        self.commands["charge"] = charge
+        fire = Command("fire", " : utiliser le beamer", Actions.fire, 0)
+        self.commands["fire"] = fire
+
+        # Créer et ajouter le beamer dans une pièce
+        beamer = Item("beamer", "un appareil de téléportation mystérieux", 0.5)
+        beamer.is_beamer = True  # Marquer cet objet comme un beamer
+        lagoon.inventory["beamer"] = beamer
+
+
     # Play the gamego
     def play(self):
         self.setup()
@@ -94,14 +141,14 @@ class Game:
         # If the command is not recognized, print an error message
         if command_word not in self.commands.keys():
             print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
+
         # If the command is recognized, execute it
-        if command_word == "go":
+        elif command_word == "go":
             if len(list_of_words) < 2:
                 print("Vous devez préciser une direction !")
                 return
-            direction = list_of_words[1]  # <- Le vrai paramètre
+            direction = list_of_words[1]
             self.player.move(direction)
-
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)

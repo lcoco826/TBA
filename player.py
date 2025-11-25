@@ -5,6 +5,8 @@ class Player:
         self.name = name
         self.current_room = None
         self.history = []  # Historique des salles visitées
+        self.inventory = {}
+        self.max_weight = 10
 
     def move(self, direction):
         # Dictionnaire de normalisation des directions
@@ -62,3 +64,16 @@ class Player:
         for room in self.history:
             lines.append(f"    - {room.description}")
         return "\n".join(lines)
+
+    # Get the inventory
+    def get_inventory(self):
+        # Si l'inventaire est vide
+        if not self.inventory:
+            return "Il n'y a rien ici."
+    
+        # Sinon, construire la chaîne avec tous les items
+        msg = "Vous disposez des items suivants :\n"
+        for item in self.inventory.values():
+             msg += f"    - {item}\n"
+        return msg
+        # Get the inventory
