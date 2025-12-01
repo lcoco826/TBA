@@ -111,7 +111,11 @@ class Game:
         beamer = Item("beamer", "un appareil de téléportation mystérieux", 0.5)
         beamer.is_beamer = True  # Marquer cet objet comme un beamer
         lagoon.inventory["beamer"] = beamer
+        
 
+        # Après la section "Create exits for rooms"
+        for room in self.rooms:
+            self.valid_directions.update([d for d in room.exits.keys() if room.exits[d] is not None])
 
     # Play the gamego
     def play(self):
@@ -132,7 +136,7 @@ class Game:
         # Si la commande est vide, ne rien faire
         if command_string == "":
             return
-            
+        
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
 
@@ -145,21 +149,40 @@ class Game:
         # If the command is recognized, execute it
         elif command_word == "go":
             if len(list_of_words) < 2:
-                print("Vous devez préciser une direction !")
+                print("\nVous devez préciser une direction !\n")
                 return
+        
             direction = list_of_words[1]
-            self.player.move(direction)
+        
+            # Normaliser la direction
+            direction_map = {
+                "N": "N", "NORD": "N", "nord": "N", "n": "N",
+                "S": "S", "SUD": "S", "sud": "S", "s": "S",
+                "E": "E", "EST": "E", "est": "E", "e": "E",
+                "O": "O", "OUEST": "O", "ouest": "O", "o": "O",
+                "U": "U", "UP": "U", "up": "U", "u": "U",
+                "D": "D", "DOWN": "D", "down": "D", "d": "D"
+            }
+        
+            normalized_direction = direction_map.get(direction)
+        
+            # Vérifier si la direction est valide dans le jeu
+            if normalized_direction not in self.valid_directions:
+                print(f"\nLa direction '{direction}' n'existe pas dans ce jeu !")
+                print(f"Directions valides : {', '.join(sorted(self.valid_directions))}\n")
+                return
+        
+            # Effectuer le déplacement
+            self.player.move(normalized_direction)
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
-
     # Print the welcome message
     def print_welcome(self):
         print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
         print("Entrez 'help' si vous avez besoin d'aide.")
         #
-        print(self.player.current_room.get_long_description())
-    
+        print(self.player.current_room.get_long_description())   
 
 def main():
     # Create a game object and play the game
