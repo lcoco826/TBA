@@ -78,20 +78,17 @@ class Game:
         from item import Item
 
         # Add items to rooms (dans la méthode setup())
-        sword = Item("sword", "une épée au fil tranchant comme un rasoir", 2)
-        beach.inventory["sword"] = sword
+        parchemin = Item("parchemin", "Vous apercevez un morceau de parchemin à côté d'un squelette. Vous pouvez y lire \"Celui qui veut survivre devra faire l\'inverse de ce que dit le crocodile.\"", 0)
+        beach.inventory["parchemin"] = parchemin
 
-        potion = Item("potion", "une fiole contenant un liquide verdâtre", 0.5)
-        cove.inventory["potion"] = potion
+        bananes = Item("bananes", "Vous trouvez des bananes accrochées aux arbres.", 5)
+        forest.inventory["bananes"] = bananes
 
-        map_item = Item("map", "une vieille carte de l'île", 0.1)
-        forest.inventory["map"] = map_item
+        barils = Item("barils", "Vous avez retrouvé les barils de vin.", 10)
+        cliff.inventory["barils"] = barils
 
-        rope = Item("rope", "une corde solide et résistante", 1)
-        cave.inventory["rope"] = rope
-
-        torch = Item("torch", "une torche qui éclaire les ténèbres", 0.5)
-        volcano.inventory["torch"] = torch
+        tresor = Item("tresor", "Vous avez retouvé le trésor.", 10)
+        waterfall.inventory["tresor"] = tresor
 
         take = Command("take", " <item> : prendre un objet", Actions.take, 1)
         self.commands["take"] = take
