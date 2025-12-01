@@ -253,3 +253,31 @@ class Actions:
         player.current_room = beamer.saved_room
         print("\nVous êtes téléporté !\n")
         print(player.current_room.get_long_description())
+
+    # Dans actions.py
+
+
+    def talk(game, list_of_words, number_of_parameters):
+        """
+        Parler avec un personnage non-joueur.
+    
+        Args:
+            game: L'instance du jeu
+            list_of_words: Liste des mots de la commande
+            number_of_parameters: Nombre de paramètres attendus
+        """
+        # Vérifier qu'un nom de personnage a été fourni
+        if len(list_of_words) < 2:
+            print("\nParler avec qui ? Utilisez : talk <nom>\n")
+            return
+    
+        character_name = list_of_words[1]
+    
+        # Vérifier si le personnage est dans la pièce actuelle
+        if character_name not in game.player.current_room.characters:
+            print(f"\n{character_name} n'est pas ici.\n")
+            return
+    
+        # Récupérer le personnage et afficher son message
+        character = game.player.current_room.characters[character_name]
+        print(f"\n{character.get_msg()}\n")

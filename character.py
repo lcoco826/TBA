@@ -1,4 +1,8 @@
 # Description: Character class
+# Description: Character class
+
+import random
+from game import DEBUG
 
 class Character:
     """
@@ -29,29 +33,59 @@ class Character:
         """
         return f"{self.name} : {self.description}"
     
-    def get_msg(self, index=0):
+    def get_msg(self):
         """
-        Retourne un message du personnage.
+        Retourne et supprime le premier message du personnage.
+        Affiche cycliquement les messages (les supprime au fur et à mesure).
         
-        Args:
-            index (int): L'index du message à retourner (par défaut 0)
-            
         Returns:
-            str: Le message ou un message par défaut si l'index est invalide
+            str: Le message du personnage
         """
+        # Si plus de messages, le personnage n'a rien à dire
         if not self.msgs:
-            return f"{self.name} n'a rien à dire."
+            return f"{self.name} n'a rien d'autre à dire."
         
-        if 0 <= index < len(self.msgs):
-            return f"{self.name} dit : '{self.msgs[index]}'"
-        
-        return f"{self.name} n'a rien d'autre à dire."
+        # Retirer et retourner le premier message
+        msg = self.msgs.pop(0)
+        return f"{self.name} dit : '{msg}'"
     
-    def move(self, new_room):
+    def move(self):
         """
-        Déplace le personnage vers une nouvelle pièce.
+        Déplace le personnage de manière aléatoire.
+        Le personnage a une chance sur deux de se déplacer.
+        S'il se déplace, il va dans une pièce adjacente au hasard.
         
-        Args:
-            new_room (Room): La nouvelle pièce de destination
+        Returns:
+            bool: True si le personnage s'est déplacé, False sinon
         """
+        # Une chance sur deux de se déplacer
+        if random.choice([True, False]):
+            if DEBUG:
+                print(f"DEBUG: {self.name} décide de rester sur place.")
+            return False
+        
+        # Récupérer les sorties disponibles (non-None)
+        available_exits = [room for room in self.current_room.exits.values() if room is not None]
+        
+        # Si aucune sortie disponible, rester sur place
+        if not available_exits:
+            if DEBUG:
+                print(f"DEBUG: {self.name} ne peut pas bouger (aucune sortie).")
+            return False
+        
+        # Choisir une pièce au hasard
+        old_room = self.current_room
+        new_room = random.choice(available_exits)
+        
+        # Retirer le personnage de l'ancienne pièce
+        if self.name in old_room.characters:
+            del old_room.characters[self.name]
+        
+        # Déplacer le personnage
         self.current_room = new_room
+        new_room.characters[self.name] = self
+        
+        if DEBUG:
+            print(f"DEBUG: {self.name} se déplace de '{old_room.name}' vers '{new_room.name}'.")
+        
+        return True
