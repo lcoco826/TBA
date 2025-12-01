@@ -281,3 +281,40 @@ class Actions:
         # Récupérer le personnage et afficher son message
         character = game.player.current_room.characters[character_name]
         print(f"\n{character.get_msg()}\n")
+
+    def debug(game, list_of_words, number_of_parameters):
+        """Basculer le mode DEBUG du jeu (affiche/masque les messages DEBUG)."""
+        # Ne prend pas de paramètre
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+
+        # Toggle global DEBUG in the game module
+        try:
+            # game module stores DEBUG at top-level
+            current = getattr(game, 'DEBUG', None)
+            if current is None:
+                # Fallback: try module-level DEBUG
+                import game as game_mod
+                current = getattr(game_mod, 'DEBUG', False)
+                new = not current
+                setattr(game_mod, 'DEBUG', new)
+                print(f"\nDEBUG : {'ON' if new else 'OFF'}\n")
+                return True
+
+            new = not current
+            setattr(game, 'DEBUG', new)
+            # Also update the module-level variable if present
+            try:
+                import game as game_mod
+                setattr(game_mod, 'DEBUG', new)
+            except Exception:
+                pass
+
+            print(f"\nDEBUG : {'ON' if new else 'OFF'}\n")
+            return True
+        except Exception as e:
+            print(f"\nImpossible de basculer DEBUG : {e}\n")
+            return False
