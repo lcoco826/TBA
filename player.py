@@ -9,33 +9,16 @@ class Player:
         self.max_weight = 10
 
     def move(self, direction):
-        # Dictionnaire de normalisation des directions
-        direction_map = {
-            "N": "N", "NORD": "N", "Nord": "N", "nord": "N", "n": "N",
-            "S": "S", "SUD": "S", "Sud": "S", "sud": "S", "s": "S",
-            "E": "E", "EST": "E", "Est": "E", "est": "E", "e": "E",
-            "O": "O", "OUEST": "O", "Ouest": "O", "ouest": "O", "o": "O",
-            "U": "U", "UP": "U", "Up": "U", "up": "U", "u": "U",
-            "D": "D", "DOWN": "D", "Down": "D", "down": "D", "d": "D"
-        }
-
-        # Normalisation de la direction
-        normalized_direction = direction_map.get(direction)
-        print(direction, normalized_direction)
-        if normalized_direction is None:
-            print(f"\nDirection '{direction}' non reconnue.\n")
-            print(self.current_room.get_long_description())
-            #print(f"\nDirection '{direction}' invalide ! Veuillez entrer une direction valide.\n")
-            return False
-
+        # La direction est déjà normalisée, pas besoin de la re-normaliser
+    
         # Vérifier si la sortie existe
-        next_room = self.current_room.exits.get(normalized_direction)
+        next_room = self.current_room.exits.get(direction)
         if next_room is None:
             print("\nAucune porte dans cette direction !\n")
             print(self.current_room.get_long_description())
             return False
 
-        # Ajouter la salle actuelle à l’historique
+        # Ajouter la salle actuelle à l'historique
         self.history.append(self.current_room)
 
         # Déplacer le joueur
@@ -44,7 +27,7 @@ class Player:
         print(self.get_history())
         return True
 
-    def undo(self):
+    def back(self):
         """Revenir à la salle précédente si possible."""
         if not self.history:
             print("\nImpossible de revenir en arrière !\n")
