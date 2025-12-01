@@ -117,7 +117,36 @@ class Game:
         for room in self.rooms:
             self.valid_directions.update([d for d in room.exits.keys() if room.exits[d] is not None])
 
-    # Play the gamego
+        from character import Character
+
+        # Créer des personnages
+        pirate = Character(
+            "Jack",
+            "un vieux pirate aux yeux perçants",
+            beach,
+            ["Arrr! Bienvenue sur mon île!", "Cherche le trésor dans la grotte!", "Méfie-toi du volcan!"]
+        )
+
+        hermit = Character(
+            "Ermite",
+            "un vieil homme sage vivant dans la forêt",
+            forest,
+            ["Bonjour voyageur...", "La nature recèle bien des secrets.", "As-tu trouvé la carte?"]
+        )
+
+        guide = Character(
+            "Guide",
+            "un habitant de l'île qui connaît tous ses secrets",
+            lagoon,
+            ["Cette lagune est magnifique, n'est-ce pas?", "Attention au volcan!", "Le beamer est un outil puissant."]
+        )  
+
+        # Ajouter les personnages aux pièces
+        beach.characters["Jack"] = pirate
+        forest.characters["Ermite"] = hermit
+        lagoon.characters["Guide"] = guide
+
+    #playthegamego
     def play(self):
         self.setup()
         self.print_welcome()
