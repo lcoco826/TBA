@@ -2,7 +2,7 @@
 # Description: Character class
 
 import random
-from game import DEBUG
+import game
 
 class Character:
     """
@@ -60,7 +60,7 @@ class Character:
         """
         # Une chance sur deux de se déplacer
         if random.choice([True, False]):
-            if DEBUG:
+            if getattr(game, "DEBUG", False):
                 print(f"DEBUG: {self.name} décide de rester sur place.")
             return False
         
@@ -69,7 +69,7 @@ class Character:
         
         # Si aucune sortie disponible, rester sur place
         if not available_exits:
-            if DEBUG:
+            if getattr(game, "DEBUG", False):
                 print(f"DEBUG: {self.name} ne peut pas bouger (aucune sortie).")
             return False
         
@@ -85,7 +85,7 @@ class Character:
         self.current_room = new_room
         new_room.characters[self.name] = self
         
-        if DEBUG:
+        if getattr(game, "DEBUG", False):
             print(f"DEBUG: {self.name} se déplace de '{old_room.name}' vers '{new_room.name}'.")
         
         return True
