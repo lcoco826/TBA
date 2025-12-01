@@ -295,25 +295,33 @@ class Actions:
         try:
             # game module stores DEBUG at top-level
             current = getattr(game, 'DEBUG', None)
+            import game as game_mod
             if current is None:
-                # Fallback: try module-level DEBUG
-                import game as game_mod
                 current = getattr(game_mod, 'DEBUG', False)
-                new = not current
-                setattr(game_mod, 'DEBUG', new)
-                print(f"\nDEBUG : {'ON' if new else 'OFF'}\n")
-                return True
 
             new = not current
-            setattr(game, 'DEBUG', new)
-            # Also update the module-level variable if present
+            # Set both the instance attribute (if present) and module-level flag
             try:
-                import game as game_mod
-                setattr(game_mod, 'DEBUG', new)
+                setattr(game, 'DEBUG', new)
             except Exception:
                 pass
+            setattr(game_mod, 'DEBUG', new)
 
             print(f"\nDEBUG : {'ON' if new else 'OFF'}\n")
+
+            # If we just turned DEBUG ON, print the buffered messages
+            if new:
+                try:
+                    buf = getattr(game_mod, 'DEBUG_LOG', [])
+                    if buf:
+                        print("--- Messages DEBUG enregistrés ---")
+                        for m in buf:
+                            print(m)
+                        # Clear buffer after showing
+                        game_mod.DEBUG_LOG = []
+                except Exception:
+                    pass
+
             return True
         except Exception as e:
             print(f"\nImpossible de basculer DEBUG : {e}\n")

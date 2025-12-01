@@ -22,6 +22,8 @@ def _detect_debug():
     return False
 
 DEBUG = _detect_debug()
+# Buffer pour stocker les messages DEBUG afin de les afficher ultérieurement
+DEBUG_LOG = []
 
 class Game:
 

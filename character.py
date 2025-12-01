@@ -60,8 +60,15 @@ class Character:
         """
         # Une chance sur deux de se déplacer
         if random.choice([True, False]):
+            # Construire le message DEBUG et le stocker
+            msg = f"DEBUG: {self.name} décide de rester sur place."
+            try:
+                game.DEBUG_LOG.append(msg)
+            except Exception:
+                pass
+            # Afficher immédiatement si le mode DEBUG est activé
             if getattr(game, "DEBUG", False):
-                print(f"DEBUG: {self.name} décide de rester sur place.")
+                print(msg)
             return False
         
         # Récupérer les sorties disponibles (non-None)
@@ -69,8 +76,13 @@ class Character:
         
         # Si aucune sortie disponible, rester sur place
         if not available_exits:
+            msg = f"DEBUG: {self.name} ne peut pas bouger (aucune sortie)."
+            try:
+                game.DEBUG_LOG.append(msg)
+            except Exception:
+                pass
             if getattr(game, "DEBUG", False):
-                print(f"DEBUG: {self.name} ne peut pas bouger (aucune sortie).")
+                print(msg)
             return False
         
         # Choisir une pièce au hasard
@@ -85,7 +97,12 @@ class Character:
         self.current_room = new_room
         new_room.characters[self.name] = self
         
+        msg = f"DEBUG: {self.name} se déplace de '{old_room.name}' vers '{new_room.name}'."
+        try:
+            game.DEBUG_LOG.append(msg)
+        except Exception:
+            pass
         if getattr(game, "DEBUG", False):
-            print(f"DEBUG: {self.name} se déplace de '{old_room.name}' vers '{new_room.name}'.")
+            print(msg)
         
         return True
