@@ -7,6 +7,8 @@ from player import Player
 from command import Command
 from actions import Actions
 
+DEBUG = True
+
 class Game:
 
     # Constructor
@@ -146,14 +148,29 @@ class Game:
         forest.characters["Ermite"] = hermit
         lagoon.characters["Guide"] = guide
 
+        # Dans setup(), avec les autres commandes
+        talk = Command("talk", " <nom> : parler avec un personnage", Actions.talk, 1)
+        self.commands["talk"] = talk
+        
     #playthegamego
     def play(self):
         self.setup()
         self.print_welcome()
+    
+        # Collecter tous les personnages du jeu
+        all_characters = []
+        for room in self.rooms:
+            all_characters.extend(room.characters.values())
+    
         # Loop until the game is finished
         while not self.finished:
             # Get the command from the player
             self.process_command(input("> "))
+        
+            # Déplacer tous les personnages après chaque commande
+            for character in all_characters:
+                character.move()
+    
         return None
 
     # Process the command entered by the player
