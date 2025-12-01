@@ -7,7 +7,7 @@ from player import Player
 from command import Command
 from actions import Actions
 
-DEBUG = True
+DEBUG = False
 
 class Game:
 
@@ -148,7 +148,7 @@ class Game:
         # Dans setup(), avec les autres commandes
         talk = Command("talk", " <nom> : parler avec un personnage", Actions.talk, 1)
         self.commands["talk"] = talk
-        
+
     #playthegamego
     def play(self):
         self.setup()
