@@ -6,8 +6,24 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
+import os
+import sys
 
-DEBUG = True
+# DEBUG can be enabled in three ways (priority order):
+# 1) Command-line flag `--debug`
+# 2) Environment variable `GAME_DEBUG=1` or `GAME_DEBUG=true`
+# 3) Default value False
+def _detect_debug():
+    if any(arg == "--debug" for arg in sys.argv[1:]):
+        return True
+    env = os.getenv("GAME_DEBUG", "0").lower()
+    if env in ("1", "true", "yes", "on"):
+        return True
+    return False
+
+DEBUG = _detect_debug()
+# Buffer pour stocker les messages DEBUG afin de les afficher ultérieurement
+DEBUG_LOG = []
 
 class Game:
 
@@ -148,7 +164,10 @@ class Game:
         # Dans setup(), avec les autres commandes
         talk = Command("talk", " <nom> : parler avec un personnage", Actions.talk, 1)
         self.commands["talk"] = talk
-        
+        # Commande debug pour basculer le mode debug à l'exécution
+        debug_cmd = Command("debug", " : basculer le mode debug (affiche les messages DEBUG)", Actions.debug, 0)
+        self.commands["debug"] = debug_cmd
+
     #playthegamego
     def play(self):
         self.setup()
