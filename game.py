@@ -73,7 +73,7 @@ class Game:
         beach.exits = {"N" : forest, "E" : None, "S" : None, "O" : cove, "U" : None, "D": None}
         cove.exits = {"N" : lagoon, "E" : beach, "S" : None, "O" : None, "U" : None, "D": None}
         forest.exits = {"N" : None, "E" : None, "S" : beach, "O" : lagoon, "U" : None, "D": None}
-        lagoon.exits = {"N" : cliff, "E" : forest, "S" : cove, "O" : None, "U" : None, "D": None}
+        lagoon.exits = {"N" : cave, "E" : forest, "S" : cove, "O" : None, "U" : None, "D": None}
         cave.exits = {"N": None, "E" : volcano, "S" : lagoon, "O" : None, "U" : cliff, "D": None}
         cliff.exits = {"N": None, "E" : None, "S": None, "O" : None, "U" : None, "D" : cave}
         volcano.exits = {"N": None, "E" : None, "S": None, "O" : cave, "U" : waterfall, "D" : forest}
@@ -184,9 +184,9 @@ class Game:
             # Get the command from the player
             self.process_command(input("> "))
         
-            # Déplacer tous les personnages après chaque commande
-            for character in all_characters:
-                character.move()
+            ## Déplacer tous les personnages après chaque commande
+            #for character in all_characters:
+            #    character.move()
     
         return None
 

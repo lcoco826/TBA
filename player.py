@@ -33,6 +33,21 @@ class Player:
             print("\nImpossible de revenir en arrière !\n")
             return False
 
+        # Récupérer la salle précédente sans la retirer de l'historique pour l'instant
+        previous_room = self.history[-1]
+    
+        # Vérifier s'il existe un chemin de retour vers la salle précédente
+        can_go_back = False
+        for direction, room in self.current_room.exits.items():
+            if room == previous_room:
+                can_go_back = True
+                break
+    
+        # Si aucun chemin de retour n'existe (sens unique)
+        if not can_go_back:
+            print("\nImpossible de faire demi-tour !\n")
+            return False
+
         # Revenir à la dernière salle visitée
         self.current_room = self.history.pop()
         print(self.current_room.get_long_description())
@@ -52,7 +67,7 @@ class Player:
     def get_inventory(self):
         # Si l'inventaire est vide
         if not self.inventory:
-            return "Il n'y a rien ici."
+            return "Votre inventaire est vide."
     
         # Sinon, construire la chaîne avec tous les items
         msg = "Vous disposez des items suivants :\n"
