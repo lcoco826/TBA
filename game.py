@@ -45,11 +45,12 @@ class Game:
         self.commands["quit"] = quit
         go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O,U,D)", Actions.go, 1)
         self.commands["go"] = go
-        # Dans Game.setup(), après les autres commandes :
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
         self.commands["look"] = look
-        # Setup rooms
+        back = Command("back", " : revenir à la salle précédente", Actions.back, 0)
+        self.commands["back"] = back
 
+        # Setup rooms
         beach = Room("Beach", "une plage de sable blanc. Vous entendez l'écume grésiller doucement lorsque la vague se brise et se retire sur les galets.")
         self.rooms.append(beach)
         cove = Room("Cove", "une crique isolée, perdue entre mer et falaises.")

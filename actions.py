@@ -144,7 +144,7 @@ class Actions:
     
         # Afficher les items présents dans la pièce
         if not game.player.current_room.inventory:
-            print("\nIl n'y a aucun objet dans cette pièce.")
+            print("\nIl n'y a aucun objet dans ce lieu.")
         else:
             print("\nVous voyez les objets suivants :")
         for item in game.player.current_room.inventory.values():
@@ -326,3 +326,13 @@ class Actions:
         except Exception as e:
             print(f"\nImpossible de basculer DEBUG : {e}\n")
             return False
+    
+    def back(game, list_of_words, number_of_parameters):
+        """
+        Permet au joueur de revenir à la salle précédente.
+        Args:
+            game : l'objet Game
+            list_of_words : les mots de la commande
+            number_of_parameters : nombre de paramètres attendus
+        """
+        game.player.back()
