@@ -135,31 +135,31 @@ class Game:
         from character import Character
 
         # Créer des personnages
-        pirate = Character(
-            "Jack",
-            "un vieux pirate aux yeux perçants",
+        perroquet = Character(
+            "Jacob",
+            "un perroquet coloré perché sur une branche",
             beach,
-            ["Arrr! Bienvenue sur mon île!", "Cherche le trésor dans la grotte!", "Méfie-toi du volcan!"]
+            ["Arrr! Bienvenue sur mon île ! Je suis Jacob !", "Cherchez le trésor sous la cascade !", "Méfiez-vous des singes !"]
         )
 
-        hermit = Character(
-            "Ermite",
-            "un vieil homme sage vivant dans la forêt",
-            forest,
-            ["Bonjour voyageur...", "La nature recèle bien des secrets.", "As-tu trouvé la carte?"]
-        )
-
-        guide = Character(
-            "Guide",
-            "un habitant de l'île qui connaît tous ses secrets",
+        crocodile = Character(
+            "Crocodile",
+            "il y a un bruit étrange dans la lagune...",
             lagoon,
-            ["Cette lagune est magnifique, n'est-ce pas?", "Attention au volcan!", "Le beamer est un outil puissant."]
+            ["Bonjour pirates...", "La nature recèle bien des secrets.", "Il faut absolument que vous vous dirigiez vers la forêt tropicale"]
+        )
+
+        singe = Character(
+            "Singes",
+            "un groupe de singes malicieux",
+            cliff,
+            ["Cette falaise est magnifique, n'est-ce pas ?", "Elle serait encore plus belle si vous en tombiez !", "MOUHAHAHA !"]
         )  
 
         # Ajouter les personnages aux pièces
-        beach.characters["Jack"] = pirate
-        forest.characters["Ermite"] = hermit
-        lagoon.characters["Guide"] = guide
+        beach.characters["Jacob"] = perroquet
+        lagoon.characters["Crocodile"] = crocodile
+        cliff.characters["Singes"] = singe
 
         # Dans setup(), avec les autres commandes
         talk = Command("talk", " <nom> : parler avec un personnage", Actions.talk, 1)

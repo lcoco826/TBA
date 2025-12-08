@@ -28,21 +28,19 @@ class Room:
         exit_string = exit_string.strip(", ")
         return exit_string
 
-    # Return a long description of this room including exits.
     def get_long_description(self):
-        """Retourne une description complète de la pièce incluant les sorties,
-        l'inventaire et les personnages présents.
+        """
+        Retourne une description de base de la pièce avec les sorties uniquement.
+        N'affiche PAS les items ni les personnages (ils seront visibles avec 'look').
         """
         msg = f"\nVous êtes dans {self.description}\n"
+        msg += self.get_exit_string() + "\n"
 
-        exit_string = self.get_exit_string()
-        if exit_string:
-            msg += exit_string + "\n"
-
-        # `get_characters` retourne aussi les items présents dans la pièce
-        characters_and_items = self.get_characters()
-        if characters_and_items:
-            msg += characters_and_items
+        # Afficher les personnages automatiquement
+        if self.characters:
+            msg += "\nVous voyez :\n"
+            for character in self.characters.values():
+                msg += f"    - {character}\n"
 
         return msg
 
