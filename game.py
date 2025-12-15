@@ -117,6 +117,24 @@ class Game:
         )
         self.quest_manager.add_quest(q_barils)
 
+        # Quête pour explorer la grotte
+        q_cave = Quest(
+            "Explorer la grotte",
+            "Découvrez les mystères cachés dans la grotte.",
+            [f"Visiter {cave.name}"],
+            reward="Lampe torche"
+        )
+        self.quest_manager.add_quest(q_cave)
+
+        # Quête pour le volcan
+        q_volcano = Quest(
+            "Survivre au volcan",
+            "Approchez et survivez aux dangers du volcan.",
+            [f"Visiter {volcano.name}"],
+            reward="Cendre rare"
+        )
+        self.quest_manager.add_quest(q_volcano)
+
         # Activation automatique : activer 'Explorer l'île' dès le départ
         try:
             self.quest_manager.activate_quest("Explorer l'île")
@@ -128,6 +146,8 @@ class Game:
         self.auto_activate_map = {
             "Lagoon": "Trouver le trésor",
             "Cliff": "Récupérer les barils",
+            "Cave": "Explorer la grotte",
+            "Volcano": "Survivre au volcan",
         }
 
         # Dans setup(), après les autres commandes :
@@ -294,7 +314,10 @@ class Game:
                         if hasattr(self, 'auto_activate_map'):
                             quest_to_activate = self.auto_activate_map.get(self.player.current_room.name)
                             if quest_to_activate:
-                                self.quest_manager.activate_quest(quest_to_activate)
+                                activated = self.quest_manager.activate_quest(quest_to_activate)
+                                # Afficher un message clair quand l'activation est automatique
+                                if activated:
+                                    print(f"\n(Automatique) Quête activée : {quest_to_activate}\n")
                     except Exception:
                         pass
             except Exception:
