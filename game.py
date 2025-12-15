@@ -91,7 +91,7 @@ class Game:
         # Initialise le gestionnaire de quêtes pour ce joueur
         self.quest_manager = QuestManager(self.player)
 
-        # Exemple de quêtes adaptées au monde actuel
+        #quêtes 
         q_explore = Quest(
             "Explorer l'île",
             "Visitez plusieurs lieux importants de l'île.",
