@@ -108,6 +108,28 @@ class Game:
         )
         self.quest_manager.add_quest(q_treasure)
 
+        # Quête pour récupérer les barils (exemple) et activation automatique en entrant sur la falaise
+        q_barils = Quest(
+            "Récupérer les barils",
+            "Récupérez les barils perdus sur la falaise.",
+            ["prendre barils"],
+            reward="Barils de vin"
+        )
+        self.quest_manager.add_quest(q_barils)
+
+        # Activation automatique : activer 'Explorer l'île' dès le départ
+        try:
+            self.quest_manager.activate_quest("Explorer l'île")
+        except Exception:
+            pass
+
+        # Map pour activation automatique de quêtes lors de l'entrée dans certaines salles
+        # clef = nom de la salle, valeur = titre de la quête à activer
+        self.auto_activate_map = {
+            "Lagoon": "Trouver le trésor",
+            "Cliff": "Récupérer les barils",
+        }
+
         # Dans setup(), après les autres commandes :
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
         self.commands["look"] = look
@@ -267,13 +289,14 @@ class Game:
             try:
                 if moved and hasattr(self, 'quest_manager'):
                     self.quest_manager.check_room_objectives(self.player.current_room.name)
-                    # Activation automatique: lancer la quête "Trouver le trésor" en entrant à Lagoon
-                    if self.player.current_room.name == "Lagoon":
-                        # Tenter d'activer la quête si elle existe et n'est pas encore active
-                        try:
-                            self.quest_manager.activate_quest("Trouver le trésor")
-                        except Exception:
-                            pass
+                    # Activation automatique : vérifier la map et activer la quête correspondante
+                    try:
+                        if hasattr(self, 'auto_activate_map'):
+                            quest_to_activate = self.auto_activate_map.get(self.player.current_room.name)
+                            if quest_to_activate:
+                                self.quest_manager.activate_quest(quest_to_activate)
+                    except Exception:
+                        pass
             except Exception:
                 pass
         else:
