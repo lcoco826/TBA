@@ -184,6 +184,12 @@ class Actions:
     
         # Message de confirmation
         print(f"\nVous avez pris l'objet '{item_name}'.")
+        # Vérifier les objectifs de quête liés à l'action 'prendre'
+        try:
+            if hasattr(game, 'quest_manager'):
+                game.quest_manager.check_action_objectives("prendre", item_name)
+        except Exception:
+            pass
 
 
     # Drop an item in the current room
@@ -233,6 +239,11 @@ class Actions:
         # Enregistrer la salle actuelle
         beamer.saved_room = player.current_room
         print("\nLe beamer est chargé !\n")
+        try:
+            if hasattr(game, 'quest_manager'):
+                game.quest_manager.check_action_objectives("charger", "beamer")
+        except Exception:
+            pass
 
     def fire(game, params, n_params):
         """Utiliser le beamer pour se téléporter."""
@@ -253,6 +264,11 @@ class Actions:
         player.current_room = beamer.saved_room
         print("\nVous êtes téléporté !\n")
         print(player.current_room.get_long_description())
+        try:
+            if hasattr(game, 'quest_manager'):
+                game.quest_manager.check_action_objectives("utiliser", "beamer")
+        except Exception:
+            pass
 
     # Dans actions.py
 
@@ -281,6 +297,13 @@ class Actions:
         # Récupérer le personnage et afficher son message
         character = game.player.current_room.characters[character_name]
         print(f"\n{character.get_msg()}\n")
+        # Vérifier les objectifs liés à la conversation
+        try:
+            if hasattr(game, 'quest_manager'):
+                # utiliser le verbe français 'parler'
+                game.quest_manager.check_action_objectives("parler", character_name)
+        except Exception:
+            pass
 
     def debug(game, list_of_words, number_of_parameters):
         """Basculer le mode DEBUG du jeu (affiche/masque les messages DEBUG)."""

@@ -6,6 +6,7 @@ from room import Room
 from player import Player
 from command import Command
 from actions import Actions
+from quest import Quest, QuestManager
 import os
 import sys
 
@@ -86,6 +87,26 @@ class Game:
 
         self.player = Player(input("\nEntrez votre nom: "))
         self.player.current_room = beach
+
+        # Initialise le gestionnaire de quêtes pour ce joueur
+        self.quest_manager = QuestManager(self.player)
+
+        # Exemple de quêtes adaptées au monde actuel
+        q_explore = Quest(
+            "Explorer l'île",
+            "Visitez plusieurs lieux importants de l'île.",
+            [f"Visiter {r.name}" for r in (beach, forest, lagoon)],
+            reward="Carte de l'île"
+        )
+        self.quest_manager.add_quest(q_explore)
+
+        q_treasure = Quest(
+            "Trouver le trésor",
+            "Retrouvez le trésor caché dans la lagune ou la cascade.",
+            ["prendre tresor", "prendre parchemin"],
+            reward="Trésor"
+        )
+        self.quest_manager.add_quest(q_treasure)
 
         # Dans setup(), après les autres commandes :
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
@@ -168,6 +189,11 @@ class Game:
         # Commande debug pour basculer le mode debug à l'exécution
         debug_cmd = Command("debug", " : basculer le mode debug (affiche les messages DEBUG)", Actions.debug, 0)
         self.commands["debug"] = debug_cmd
+        # Commandes liées aux quêtes
+        quests_cmd = Command("quests", " : lister les quêtes disponibles", Actions.show_quests, 0)
+        self.commands["quests"] = quests_cmd
+        quest_cmd = Command("quest", " <titre> : afficher les détails d'une quête", Actions.show_quest, 1)
+        self.commands["quest"] = quest_cmd
 
     #playthegamego
     def play(self):
@@ -236,7 +262,13 @@ class Game:
                 return
         
             # Effectuer le déplacement
-            self.player.move(normalized_direction)
+            moved = self.player.move(normalized_direction)
+            # Vérifier les objectifs liés aux salles
+            try:
+                if moved and hasattr(self, 'quest_manager'):
+                    self.quest_manager.check_room_objectives(self.player.current_room.name)
+            except Exception:
+                pass
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
