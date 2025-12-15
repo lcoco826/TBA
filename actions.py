@@ -359,3 +359,42 @@ class Actions:
             number_of_parameters : nombre de paramètres attendus
         """
         game.player.back()
+
+    def show_quests(game, list_of_words, number_of_parameters):
+        """Afficher la liste des quêtes (commande `quests`)."""
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+
+        try:
+            if hasattr(game, 'quest_manager'):
+                game.quest_manager.show_quests()
+                return True
+            else:
+                print("\nAucun gestionnaire de quêtes disponible.\n")
+                return False
+        except Exception as e:
+            print(f"\nErreur lors de l'affichage des quêtes: {e}\n")
+            return False
+
+    def show_quest(game, list_of_words, number_of_parameters):
+        """Afficher les détails d'une quête (commande `quest <titre>`)."""
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG1.format(command_word=command_word))
+            return False
+
+        quest_title = list_of_words[1]
+        try:
+            if hasattr(game, 'quest_manager'):
+                game.quest_manager.show_quest_details(quest_title)
+                return True
+            else:
+                print("\nAucun gestionnaire de quêtes disponible.\n")
+                return False
+        except Exception as e:
+            print(f"\nErreur lors de l'affichage de la quête: {e}\n")
+            return False
