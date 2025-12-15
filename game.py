@@ -267,6 +267,13 @@ class Game:
             try:
                 if moved and hasattr(self, 'quest_manager'):
                     self.quest_manager.check_room_objectives(self.player.current_room.name)
+                    # Activation automatique: lancer la quête "Trouver le trésor" en entrant à Lagoon
+                    if self.player.current_room.name == "Lagoon":
+                        # Tenter d'activer la quête si elle existe et n'est pas encore active
+                        try:
+                            self.quest_manager.activate_quest("Trouver le trésor")
+                        except Exception:
+                            pass
             except Exception:
                 pass
         else:
