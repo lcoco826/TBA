@@ -7,6 +7,7 @@ class Player:
         self.history = []  # Historique des salles visitées
         self.inventory = {}
         self.max_weight = 10
+        self.rewards = []  # Récompenses obtenues
 
     def move(self, direction):
         # La direction est déjà normalisée, pas besoin de la re-normaliser
@@ -75,3 +76,19 @@ class Player:
              msg += f"    - {item}\n"
         return msg
         # Get the inventory
+
+    def add_reward(self, reward):
+        """Ajouter une récompense au joueur et l'enregistrer."""
+        if not hasattr(self, 'rewards'):
+            self.rewards = []
+        self.rewards.append(reward)
+        print(f"\nVous avez reçu : {reward}\n")
+
+    def get_rewards(self):
+        """Retourne une chaîne listant les récompenses obtenues."""
+        if not getattr(self, 'rewards', None):
+            return "Vous n'avez obtenu aucune récompense."
+        lines = ["Récompenses obtenues :"]
+        for r in self.rewards:
+            lines.append(f"  - {r}")
+        return "\n" + "\n".join(lines) + "\n"

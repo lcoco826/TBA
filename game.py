@@ -58,15 +58,15 @@ class Game:
         self.rooms.append(cove)
         forest = Room("Forêt", "une forêt tropicale, dense et humide.")
         self.rooms.append(forest)
-        lagoon = Room("Lagoon", "la lagune s'étire paisiblement, ses eaux turquoises reflétant le ciel.")
+        lagoon = Room("Lagoon", "une lagune s'étire paisiblement, ses eaux turquoises reflétant le ciel.")
         self.rooms.append(lagoon)
-        cliff = Room("Cliff", "la falaise, elle se détache sur l'horizon, comme un mur de pierre.")
+        cliff = Room("Cliff", "une falaise, elle se détache sur l'horizon, comme un mur de pierre.")
         self.rooms.append(cliff)
         volcano = Room("Volcano", "un volcan, majestueux domine l'île, ses flancs noirs et rugueux témoignent des anciennes coulées de lave.")
         self.rooms.append(volcano)
         cave = Room("Cave", "une grotte mystérieuse et sombre se cache derrière la cascade.")
         self.rooms.append(cave)
-        waterfall = Room("Waterfall", "la cascade qui dévale la falaise avec fracas, projetant des éclats d'eau créant un nuage de brume.")
+        waterfall = Room("Waterfall", "une cascade qui dévale la falaise avec fracas, projetant des éclats d'eau créant un nuage de brume.")
         self.rooms.append(waterfall)
 
         # Create exits for rooms
@@ -135,20 +135,10 @@ class Game:
         )
         self.quest_manager.add_quest(q_volcano)
 
-        # Activation automatique : activer 'Explorer l'île' dès le départ
-        try:
-            self.quest_manager.activate_quest("Explorer l'île")
-        except Exception:
-            pass
-
-        # Map pour activation automatique de quêtes lors de l'entrée dans certaines salles
-        # clef = nom de la salle, valeur = titre de la quête à activer
-        self.auto_activate_map = {
-            "Lagoon": "Trouver le trésor",
-            "Cliff": "Récupérer les barils",
-            "Cave": "Explorer la grotte",
-            "Volcano": "Survivre au volcan",
-        }
+        # NOTE: suppression de l'activation automatique des quêtes.
+        # Les quêtes sont ajoutées au gestionnaire mais ne sont pas activées
+        # automatiquement. L'utilisateur peut découvrir et activer les
+        # quêtes via les commandes `quests` / `quest` / `rewards`.
 
         # Dans setup(), après les autres commandes :
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
@@ -236,6 +226,9 @@ class Game:
         self.commands["quests"] = quests_cmd
         quest_cmd = Command("quest", " <titre> : afficher les détails d'une quête", Actions.show_quest, 1)
         self.commands["quest"] = quest_cmd
+        # Commande pour afficher les récompenses obtenues
+        rewards_cmd = Command("rewards", " : afficher les récompenses obtenues", Actions.show_rewards, 0)
+        self.commands["rewards"] = rewards_cmd
 
     #playthegamego
     def play(self):

@@ -398,3 +398,22 @@ class Actions:
         except Exception as e:
             print(f"\nErreur lors de l'affichage de la quête: {e}\n")
             return False
+
+    def show_rewards(game, list_of_words, number_of_parameters):
+        """Afficher les récompenses obtenues par le joueur (commande `rewards`)."""
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+
+        try:
+            player = game.player
+            if not player:
+                print("\nAucun joueur chargé.\n")
+                return False
+            print(player.get_rewards())
+            return True
+        except Exception as e:
+            print(f"\nErreur lors de l'affichage des récompenses: {e}\n")
+            return False
