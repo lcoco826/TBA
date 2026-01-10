@@ -52,6 +52,10 @@ class Game:
         self.commands["help"] = help
         quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
         self.commands["quit"] = quit
+        # Alias/commande supplémentaire pour arrêter le jeu si souhaité
+        if "stop" not in self.commands:
+            stop = Command("stop", " : arrêter le jeu", Actions.quit, 0)
+            self.commands["stop"] = stop
         go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O,U,D)", Actions.go, 1)
         self.commands["go"] = go
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
@@ -60,13 +64,13 @@ class Game:
         self.commands["back"] = back
 
         # Setup rooms
-        beach = Room("Beach", "une plage de sable blanc. Capitaine, votre équipage a survécu cependant des singes ont volé toutes vos ressources, c'est à vous de découvrir cette île, retrouver vos ressources et trouver un moyen de partir !.")
+        beach = Room("Beach", "une plage de sable blanc. Capitaine, votre équipage a survécu cependant des singes ont volé toutes vos ressources, c'est à vous de découvrir cette île, retrouver vos ressources et trouver votre bonheur !")
         self.rooms.append(beach)
-        cove = Room("Cove", "une crique isolée, un squelette murmure : .")
+        cove = Room("Cove", "une crique isolée, le calme y règne, cela paraît presque étrange...")
         self.rooms.append(cove)
-        forest = Room("Forêt", "une forêt tropicale, dense et humide.")
+        forest = Room("Forêt", "une forêt tropicale, dense et humide, attention des plantes carnivores vous attaquent! ")
         self.rooms.append(forest)
-        lagoon = Room("Lagoon", "une lagune s'étire paisiblement, ses eaux turquoises reflétant le ciel.")
+        lagoon = Room("Lagoon", "une lagune, ses eaux turquoises reflétant le ciel et les palmiers.")
         self.rooms.append(lagoon)
         cliff = Room("Cliff", "une falaise, elle se détache sur l'horizon, comme un mur de pierre.")
         self.rooms.append(cliff)
@@ -79,7 +83,7 @@ class Game:
 
         # Create exits for rooms
 
-        beach.exits = {"N" : forest, "E" : None, "S" : None, "O" : cove, "U" : None, "D": None}
+        beach.exits = {"N" : None, "E" : None, "S" : None, "O" : cove, "U" : None, "D": None}
         cove.exits = {"N" : lagoon, "E" : beach, "S" : None, "O" : None, "U" : None, "D": None}
         forest.exits = {"N" : None, "E" : None, "S" : beach, "O" : lagoon, "U" : None, "D": None}
         lagoon.exits = {"N" : cave, "E" : forest, "S" : cove, "O" : None, "U" : None, "D": None}
@@ -187,7 +191,7 @@ class Game:
         # Créer et ajouter le beamer dans une pièce
         beamer = Item("beamer", "un appareil de téléportation mystérieux", 0.5)
         beamer.is_beamer = True  # Marquer cet objet comme un beamer
-        lagoon.inventory["beamer"] = beamer
+        cliff.inventory["beamer"] = beamer
         
 
         # Après la section "Create exits for rooms"
@@ -199,23 +203,23 @@ class Game:
         # Créer des personnages
         perroquet = Character(
             "Jacob",
-            "un perroquet coloré perché sur une branche",
+            "un perroquet coloré perché sur une branche près de vous, capitaine.",
             beach,
-            ["Arrr! Bienvenue sur mon île ! Je suis Jacob !", "Cherchez le trésor sous la cascade !", "Méfiez-vous des singes !"]
+            ["Arrr! Bienvenue sur mon île ! Je suis Jacob ! Cherchez le trésor sous la cascade et celui qui veut survivre devra faire l'inverse de ce que dit le crocodile, au revoir et bonne chance !!"]
         )
 
         crocodile = Character(
             "Crocodile",
-            "il y a un bruit étrange dans la lagune...",
+            "un crocodile géant émergeant de l'eau de la lagune",
             lagoon,
-            ["Bonjour pirates...", "La nature recèle bien des secrets.", "Il faut absolument que vous vous dirigiez vers la forêt tropicale"]
+            ["Bonjour pirates...La nature recèle bien des secrets allez vers l'Est avant que je vous dévore MOUAHAHAH !"]
         )
 
         singe = Character(
             "Singes",
             "un groupe de singes malicieux",
             cliff,
-            ["Cette falaise est magnifique, n'est-ce pas ?", "Elle serait encore plus belle si vous en tombiez !", "MOUHAHAHA !"]
+            ["Cette falaise est magnifique, elle serait encore plus belle si vous en tombiez MOUHAHAHA !"]
         )  
 
         # Ajouter les personnages aux pièces
@@ -306,6 +310,15 @@ class Game:
         
             # Effectuer le déplacement
             moved = self.player.move(normalized_direction)
+            # Vérifier condition de perte : entrer dans la forêt -> plantes carnivores
+            try:
+                if moved and getattr(self.player.current_room, 'name', '').strip() == "Forêt":
+                    # Texte de défaite plus évocateur
+                    print("\nVous pénétrez plus profondément dans la Forêt.\nDes lianes visqueuses surgissent, des fleurs s'ouvrent en un claquement de crocs...\nVous êtes violemment dévoré par les plantes carnivores.\nFIN.\n")
+                    self.finished = True
+                    return
+            except Exception:
+                pass
             # Vérifier les objectifs liés aux salles
             try:
                 if moved and hasattr(self, 'quest_manager'):
@@ -356,6 +369,7 @@ def main():
                 self.game = game_instance
                 self.title("TBA - Jeu d'aventure")
                 self.protocol("WM_DELETE_WINDOW", self._on_close)
+                self._game_over_shown = False
                 # Layout
                 self._build_layout()
                 # Print welcome in text output
@@ -459,7 +473,8 @@ def main():
                 self._update_room_image()
                 if self.game.finished:
                     self.entry.configure(state="disabled")
-                    self.after(600, self._on_close)
+                    # Show a final animation or image instead of immediate close
+                    self.after(200, self._show_game_over)
 
             def _update_room_image(self):
                 # Update the canvas based on current room. If room.image exists and file exists, try to load it.
@@ -484,6 +499,46 @@ def main():
                 # Draw a simple representation
                 self.canvas.create_rectangle(0, 0, self.IMAGE_WIDTH, self.IMAGE_HEIGHT, fill="#334")
                 self.canvas.create_text(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2, text=room.name, fill="white", font=("Helvetica", 20))
+
+            def _show_game_over(self):
+                """Display final image or simple animation when the game ends."""
+                if getattr(self, '_game_over_shown', False):
+                    return
+                self._game_over_shown = True
+                # Try to load an explicit gameover image from assets
+                assets_dir = Path(__file__).parent / 'assets'
+                # Accept PNG or PPM placeholders
+                gameover_path_png = assets_dir / 'gameover.png'
+                gameover_path_ppm = assets_dir / 'gameover.ppm'
+                self.canvas.delete("all")
+                chosen = None
+                if gameover_path_png.exists():
+                    chosen = gameover_path_png
+                elif gameover_path_ppm.exists():
+                    chosen = gameover_path_ppm
+                if chosen is not None:
+                    try:
+                        img = tk.PhotoImage(file=str(chosen))
+                        self._image_ref = img
+                        self.canvas.create_image(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2, image=self._image_ref)
+                        return
+                    except Exception:
+                        chosen = None
+                if chosen is None:
+                    # Simple flashing red animation with final text
+                    steps = 6
+                    def flash(step=0):
+                        color = "#600" if step % 2 == 0 else "#300"
+                        self.canvas.delete("all")
+                        self.canvas.create_rectangle(0, 0, self.IMAGE_WIDTH, self.IMAGE_HEIGHT, fill=color)
+                        self.canvas.create_text(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2 - 10, text="VOUS AVEZ ÉTÉ DÉVORÉ", fill="white", font=("Helvetica", 16, "bold"))
+                        self.canvas.create_text(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2 + 30, text="FIN", fill="white", font=("Helvetica", 14))
+                        if step < steps:
+                            self.after(300, lambda: flash(step+1))
+                        else:
+                            # keep final frame and write to output console
+                            self._write_output("\n--- VOUS AVEZ ÉTÉ DÉVORÉ. PARTIE TERMINÉE ---\n")
+                    flash()
 
             def _on_close(self):
                 try:
