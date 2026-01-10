@@ -3,9 +3,11 @@
 class Room:
 
     # Define the constructor. 
-    def __init__(self, name, description):
+    def __init__(self, name, description, image=None):
         self.name = name
         self.description = description
+        # Optional path (relative) to an image representing the room
+        self.image = image
         self.exits = {}
         self.inventory = {}
         self.characters = {}
