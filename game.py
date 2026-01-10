@@ -1,4 +1,21 @@
-# Description: Game class
+"""
+Module Game - Moteur principal du jeu d'aventure TBA.
+
+Ce module gère:
+- L'initialisation et la boucle de jeu
+- Le chargement des salles et des commandes
+- Le traitement des entrées utilisateur
+- L'interface en ligne de commande ou graphique (Tkinter)
+
+Utilisation:
+    Mode CLI: python game.py --cli
+    Mode GUI (défaut): python game.py
+    Mode DEBUG: python game.py --debug
+
+Variables globales:
+    DEBUG: Booléen pour activer les messages de débogage
+    DEBUG_LOG: Buffer pour stocker les messages de débogage
+"""
 
 # Import modules
 
@@ -18,11 +35,22 @@ except Exception:
     ttk = None
     from pathlib import Path
 
-# DEBUG can be enabled in three ways (priority order):
-# 1) Command-line flag `--debug`
-# 2) Environment variable `GAME_DEBUG=1` or `GAME_DEBUG=true`
-# 3) Default value False
+# DEBUG peut être activé de trois façons (ordre de priorité):
+# 1) Flag en ligne de commande `--debug`
+# 2) Variable d'environnement `GAME_DEBUG=1` ou `GAME_DEBUG=true`
+# 3) Valeur par défaut False
 def _detect_debug():
+    """
+    Détecte si le mode DEBUG est activé.
+    
+    Ordre de priorité:
+    1. Flag --debug en ligne de commande
+    2. Variable d'environnement GAME_DEBUG
+    3. Valeur par défaut (False)
+    
+    Returns:
+        bool: True si le mode DEBUG est activé
+    """
     if any(arg == "--debug" for arg in sys.argv[1:]):
         return True
     env = os.getenv("GAME_DEBUG", "0").lower()
@@ -35,16 +63,53 @@ DEBUG = _detect_debug()
 DEBUG_LOG = []
 
 class Game:
+    """
+    Classe principale du jeu d'aventure.
+    
+    Gère:
+    - L'état du jeu (salles, joueur, commandes)
+    - La boucle de jeu
+    - Le traitement des commandes
+    - L'interface utilisateur
+    
+    Attributs:
+        finished (bool): Si le jeu est terminé
+        rooms (list): Liste des salles du jeu
+        commands (dict): Dictionnaire des commandes disponibles
+        player (Player): L'instance du joueur
+        player_name (str): Nom optionnel du joueur
+        valid_directions (set): Ensemble des directions valides utilisées
+        quest_manager (QuestManager): Gestionnaire des quêtes
+    """
 
-    # Constructor
-    def __init__(self):
+    def __init__(self, player_name=None):
+        """
+        Initialiser une nouvelle instance de jeu.
+        
+        Args:
+            player_name (str, optional): Nom du joueur. Si None, sera demandé
+                                        lors de setup() en mode CLI
+        """
         self.finished = False
         self.rooms = []
         self.commands = {}
         self.player = None
+        self.player_name = player_name  # Nom optionnel du joueur
         self.valid_directions = set()
-    # Setup the game
+        
     def setup(self):
+        """
+        Initialiser et configurer le jeu.
+        
+        Cette méthode:
+        - Crée toutes les salles et leurs connexions
+        - Ajoute les items et personnages
+        - Enregistre les commandes disponibles
+        - Crée le joueur
+        - Initialise le gestionnaire de quêtes
+        
+        Note: Ne doit être appelée qu'une seule fois au démarrage du jeu
+        """
 
         # Setup commands
 
@@ -97,7 +162,13 @@ class Game:
 
         # Setup player and starting room
 
-        self.player = Player(input("\nEntrez votre nom: "))
+        # Use provided name or ask interactively if not provided
+        if self.player_name:
+            player_name = self.player_name
+        else:
+            player_name = input("\nEntrez votre nom: ")
+        
+        self.player = Player(player_name)
         self.player.current_room = beach
 
         # Initialise le gestionnaire de quêtes pour ce joueur
@@ -242,8 +313,19 @@ class Game:
         rewards_cmd = Command("rewards", " : afficher les récompenses obtenues", Actions.show_rewards, 0)
         self.commands["rewards"] = rewards_cmd
 
-    #playthegamego
     def play(self):
+        """
+        Lancer la boucle principale du jeu (mode CLI).
+        
+        Cette méthode:
+        1. Initialise le jeu via setup()
+        2. Affiche le message de bienvenue
+        3. Entre dans la boucle de jeu
+        4. Continue jusqu'à ce que le jeu soit terminé
+        
+        Returns:
+            None: Le jeu se termine quand finished est True
+        """
         self.setup()
         self.print_welcome()
     
@@ -257,14 +339,27 @@ class Game:
             # Get the command from the player
             self.process_command(input("> "))
         
-            ## Déplacer tous les personnages après chaque commande
-            #for character in all_characters:
-            #    character.move()
-    
         return None
 
-    # Process the command entered by the player
     def process_command(self, command_string) -> None:
+        """
+        Traiter une commande saisie par le joueur.
+        
+        Processus:
+        1. Valide et nettoie la saisie
+        2. Extrait la commande et les paramètres
+        3. Cherche la commande dans le dictionnaire
+        4. Exécute l'action correspondante
+        5. Vérifie les conditions de défaite
+        
+        Args:
+            command_string (str): La chaîne saisie par l'utilisateur
+            
+        Affiche des messages d'erreur si:
+        - La commande n'existe pas
+        - Les paramètres sont incorrects
+        - L'action échoue
+        """
 
         # Supprimer les espaces
         command_string = command_string.strip()
@@ -276,19 +371,21 @@ class Game:
         # Split the command string into a list of words
         list_of_words = command_string.split(" ")
 
-        command_word = list_of_words[0]
+        command_word = list_of_words[0].lower()
 
         # If the command is not recognized, print an error message
         if command_word not in self.commands.keys():
-            print(f"\nCommande '{command_word}' non reconnue. Entrez 'help' pour voir la liste des commandes disponibles.\n")
+            print(f"\n❌ Commande '{command_word}' non reconnue.")
+            print(f"   Utilisez 'help' pour voir la liste des commandes disponibles.\n")
 
         # If the command is recognized, execute it
         elif command_word == "go":
             if len(list_of_words) < 2:
-                print("\nVous devez préciser une direction !\n")
+                print("\n❌ Erreur: Vous devez préciser une direction !")
+                print("   Utilisation: go <direction>\n")
                 return
         
-            direction = list_of_words[1]
+            direction = list_of_words[1].upper()
         
             # Normaliser la direction
             direction_map = {
@@ -304,8 +401,8 @@ class Game:
         
             # Vérifier si la direction est valide dans le jeu
             if normalized_direction not in self.valid_directions:
-                print(f"\nLa direction '{direction}' n'existe pas dans ce jeu !")
-                print(f"Directions valides : {', '.join(sorted(self.valid_directions))}\n")
+                print(f"\n❌ Direction '{direction}' invalide dans ce jeu.")
+                print(f"   Directions valides: {', '.join(sorted(self.valid_directions))}\n")
                 return
         
             # Effectuer le déplacement
@@ -314,7 +411,10 @@ class Game:
             try:
                 if moved and getattr(self.player.current_room, 'name', '').strip() == "Forêt":
                     # Texte de défaite plus évocateur
-                    print("\nVous pénétrez plus profondément dans la Forêt.\nDes lianes visqueuses surgissent, des fleurs s'ouvrent en un claquement de crocs...\nVous êtes violemment dévoré par les plantes carnivores.\nFIN.\n")
+                    print("\n☠️  Vous pénétrez plus profondément dans la Forêt.")
+                    print("    Des lianes visqueuses surgissent, des fleurs s'ouvrent en un claquement de crocs...")
+                    print("    Vous êtes violemment dévoré par les plantes carnivores.")
+                    print("    FIN.\n")
                     self.finished = True
                     return
             except Exception:
@@ -339,11 +439,20 @@ class Game:
         else:
             command = self.commands[command_word]
             command.action(self, list_of_words, command.number_of_parameters)
-    # Print the welcome message
     def print_welcome(self):
-        print(f"\nBienvenue {self.player.name} dans ce jeu d'aventure !")
-        print("Entrez 'help' si vous avez besoin d'aide.")
-        #
+        """
+        Afficher le message de bienvenue et la description initiale.
+        
+        Affiche:
+        - Un message de bienvenue personnalisé
+        - Un rappel pour utiliser 'help'
+        - La description de la salle de départ
+        """
+        print(f"\n{'='*50}")
+        print(f"🎮 Bienvenue {self.player.name} dans ce jeu d'aventure !")
+        print(f"{'='*50}")
+        print("💡 Entrez 'help' si vous avez besoin d'aide sur les commandes.")
+        print(f"{'='*50}\n")
         print(self.player.current_room.get_long_description())   
 
 def main():
@@ -356,8 +465,8 @@ def main():
     try:
         if tk is None:
             raise ImportError("Tkinter not available")
-        # Create game and GUI
-        game = Game()
+        # Create game and GUI with a default player name for GUI mode
+        game = Game(player_name="Aventurier")
         game.setup()
         app = None
         class GameGUI(tk.Tk):
