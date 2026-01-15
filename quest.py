@@ -56,16 +56,10 @@ class Quest:
         >>> quest.is_active
         False
         >>> quest.activate()
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Adventure
-        📝 Go on an adventure
-        <BLANKLINE>
         >>> quest.is_active
         True
         """
         self.is_active = True
-        print(f"\n🗡️  Nouvelle quête activée: {self.title}")
-        print(f"📝 {self.description}\n")
 
 
     def complete_objective(self, objective, player=None):
@@ -83,7 +77,6 @@ class Quest:
         
         >>> quest = Quest("Hunt", "Hunt monsters", ["Kill 5 goblins", "Kill 3 orcs"])
         >>> quest.complete_objective("Kill 5 goblins")
-        ✅ Objectif accompli: Kill 5 goblins
         True
         >>> len(quest.completed_objectives)
         1
@@ -94,7 +87,6 @@ class Quest:
         """
         if objective in self.objectives and objective not in self.completed_objectives:
             self.completed_objectives.append(objective)
-            print(f"✅ Objectif accompli: {objective}")
 
             # Check if all objectives are completed
             if len(self.completed_objectives) == len(self.objectives):
@@ -116,22 +108,15 @@ class Quest:
         >>> quest = Quest("Final Quest", "The last quest", ["Win"], "Trophy")
         >>> quest.is_completed
         False
-        >>> quest.complete_quest() # doctest: +NORMALIZE_WHITESPACE
-        <BLANKLINE>
-        🏆 Quête terminée: Final Quest
-        🎁 Récompense: Trophy
-        <BLANKLINE>
+        >>> quest.complete_quest()
         >>> quest.is_completed
         True
         """
         if not self.is_completed:
             self.is_completed = True
-            print(f"\n🏆 Quête terminée: {self.title}")
             if self.reward:
-                print(f"🎁 Récompense: {self.reward}")
                 if player:
                     player.add_reward(self.reward)
-            print()
 
 
     def get_status(self):
@@ -147,14 +132,9 @@ class Quest:
         >>> quest.get_status()
         '❓ Collect (Non activée)'
         >>> quest.activate()
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Collect
-        📝 Collect items
-        <BLANKLINE>
         >>> quest.get_status()
         '⏳ Collect (0/2 objectifs)'
         >>> quest.complete_objective("Get sword")
-        ✅ Objectif accompli: Get sword
         True
         >>> quest.get_status()
         '⏳ Collect (1/2 objectifs)'
@@ -259,10 +239,6 @@ class Quest:
         
         >>> quest = Quest("Explore", "Explore the castle", ["Visiter Castle"])
         >>> quest.check_room_objective("Castle")
-        ✅ Objectif accompli: Visiter Castle
-        <BLANKLINE>
-        🏆 Quête terminée: Explore
-        <BLANKLINE>
         True
         >>> quest.check_room_objective("Tower")
         False
@@ -296,10 +272,6 @@ class Quest:
         
         >>> quest = Quest("Talk", "Have a conversation", ["parler avec garde"])
         >>> quest.check_action_objective("parler", "garde") # doctest: +NORMALIZE_WHITESPACE
-        ✅ Objectif accompli: parler avec garde
-        <BLANKLINE>
-        🏆 Quête terminée: Talk
-        <BLANKLINE>
         True
         >>> quest.check_action_objective("courir", "vite")
         False
@@ -338,10 +310,6 @@ class Quest:
         >>> quest.check_counter_objective("Marcher", 3)
         False
         >>> quest.check_counter_objective("Marcher", 5) # doctest: +ELLIPSIS
-        ✅ Objectif accompli: Marcher 5 fois
-        <BLANKLINE>
-        🏆 Quête terminée: Walker
-        <BLANKLINE>
         True
         """
         for objective in self.objectives:
@@ -366,11 +334,7 @@ class Quest:
         >>> quest = Quest("String Test", "Test __str__", ["Task 1"])
         >>> str(quest)
         '❓ String Test (Non activée)'
-        >>> quest.activate() # doctest: +NORMALIZE_WHITESPACE
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: String Test
-        📝 Test __str__
-        <BLANKLINE>
+        >>> quest.activate()
         >>> str(quest)
         '⏳ String Test (0/1 objectifs)'
         """
@@ -444,10 +408,6 @@ class QuestManager:
         >>> quest = Quest("Epic Quest", "An epic adventure")
         >>> manager.add_quest(quest)
         >>> manager.activate_quest("Epic Quest")
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Epic Quest
-        📝 An epic adventure
-        <BLANKLINE>
         True
         >>> len(manager.active_quests)
         1
@@ -477,17 +437,9 @@ class QuestManager:
         >>> manager = QuestManager()
         >>> quest = Quest("Manager Quest", "Test", ["Do something"])
         >>> manager.add_quest(quest)
-        >>> manager.activate_quest("Manager Quest") # doctest: +NORMALIZE_WHITESPACE
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Manager Quest
-        📝 Test
-        <BLANKLINE>
+        >>> manager.activate_quest("Manager Quest")
         True
-        >>> manager.complete_objective("Do something") # doctest: +NORMALIZE_WHITESPACE
-        ✅ Objectif accompli: Do something
-        <BLANKLINE>
-        🏆 Quête terminée: Manager Quest
-        <BLANKLINE>
+        >>> manager.complete_objective("Do something")
         True
         >>> manager.complete_objective("Do nothing")
         False
@@ -513,17 +465,9 @@ class QuestManager:
         >>> manager = QuestManager()
         >>> quest = Quest("Visit Places", "Visit rooms", ["Visiter Library"])
         >>> manager.add_quest(quest)
-        >>> manager.activate_quest("Visit Places") # doctest: +NORMALIZE_WHITESPACE
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Visit Places
-        📝 Visit rooms
-        <BLANKLINE>
+        >>> manager.activate_quest("Visit Places")
         True
-        >>> manager.check_room_objectives("Library") # doctest: +NORMALIZE_WHITESPACE
-        ✅ Objectif accompli: Visiter Library
-        <BLANKLINE>
-        🏆 Quête terminée: Visit Places
-        <BLANKLINE>
+        >>> manager.check_room_objectives("Library")
         >>> len(manager.active_quests)
         0
         """
@@ -546,17 +490,9 @@ class QuestManager:
         >>> manager = QuestManager()
         >>> quest = Quest("Actions", "Do actions", ["parler avec roi"])
         >>> manager.add_quest(quest)
-        >>> manager.activate_quest("Actions") # doctest: +NORMALIZE_WHITESPACE
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Actions
-        📝 Do actions
-        <BLANKLINE>
+        >>> manager.activate_quest("Actions")
         True
-        >>> manager.check_action_objectives("parler", "roi") # doctest: +NORMALIZE_WHITESPACE
-        ✅ Objectif accompli: parler avec roi
-        <BLANKLINE>
-        🏆 Quête terminée: Actions
-        <BLANKLINE>
+        >>> manager.check_action_objectives("parler", "roi")
         >>> len(manager.active_quests)
         0
         """
@@ -579,20 +515,12 @@ class QuestManager:
         >>> manager = QuestManager()
         >>> quest = Quest("Counter", "Count things", ["Compter 3 fois"])
         >>> manager.add_quest(quest)
-        >>> manager.activate_quest("Counter") # doctest: +NORMALIZE_WHITESPACE
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Counter
-        📝 Count things
-        <BLANKLINE>
+        >>> manager.activate_quest("Counter")
         True
         >>> manager.check_counter_objectives("Compter", 2)
         >>> len(manager.active_quests)
         1
-        >>> manager.check_counter_objectives("Compter", 3) # doctest: +NORMALIZE_WHITESPACE
-        ✅ Objectif accompli: Compter 3 fois
-        <BLANKLINE>
-        🏆 Quête terminée: Counter
-        <BLANKLINE>
+        >>> manager.check_counter_objectives("Compter", 3)
         >>> len(manager.active_quests)
         0
         """
@@ -617,10 +545,6 @@ class QuestManager:
         >>> len(manager.get_active_quests())
         0
         >>> manager.activate_quest("Active Quest")
-        <BLANKLINE>
-        🗡️  Nouvelle quête activée: Active Quest
-        📝 An active quest
-        <BLANKLINE>
         True
         >>> len(manager.get_active_quests())
         1
@@ -693,7 +617,7 @@ class QuestManager:
         >>> manager.show_quests() # doctest: +NORMALIZE_WHITESPACE
         <BLANKLINE>
         📋 Liste des quêtes:
-        ❓ Display Quest (Non activée)
+        Display Quest (Non activée)
         <BLANKLINE>
         """
         if not self.quests:

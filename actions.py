@@ -139,7 +139,7 @@ class Actions:
         
         # Afficher la liste des commandes disponibles
         print("\n" + "="*50)
-        print("📋 AIDE - Commandes disponibles:")
+        print("📋 AIDE - Commandes disponibles :")
         print("="*50)
         for command in game.commands.values():
             print("\t- " + str(command))
@@ -231,7 +231,7 @@ class Actions:
         
         if not found_item:
             print(f"\n❌ Il n'y a pas de '{item_name}' ici.")
-            print(f"   Items disponibles: {', '.join(room.inventory.keys()) if room.inventory else 'aucun'}\n")
+            print(f"   Items disponibles : {', '.join(room.inventory.keys()) if room.inventory else 'aucun'}\n")
             return False
         
         item = room.inventory[found_item]
@@ -243,9 +243,9 @@ class Actions:
         if current_weight + item.weight > max_weight:
             remaining_capacity = max_weight - current_weight
             print(f"\n❌ Vous ne pouvez pas porter '{found_item}'.")
-            print(f"   Poids actuel: {current_weight:.1f} kg / {max_weight} kg")
-            print(f"   Poids de l'item: {item.weight:.1f} kg")
-            print(f"   Capacité restante: {remaining_capacity:.1f} kg\n")
+            print(f"   Poids actuel : {current_weight:.1f} kg / {max_weight} kg")
+            print(f"   Poids de l'item : {item.weight:.1f} kg")
+            print(f"   Capacité restante : {remaining_capacity:.1f} kg\n")
             return False
         
         # Ajouter l'item à l'inventaire du joueur
@@ -253,7 +253,7 @@ class Actions:
         del room.inventory[found_item]
         
         print(f"\n✅ Vous avez pris l'objet '{found_item}'.")
-        print(f"   Poids actuel: {current_weight + item.weight:.1f} kg / {max_weight} kg\n")
+        print(f"   Poids actuel : {current_weight + item.weight:.1f} kg / {max_weight} kg\n")
         
         # Vérifier les objectifs de quête
         try:
@@ -356,8 +356,8 @@ class Actions:
             for item in inventory.values():
                 print(f"  - {item}")
             print("-" * 50)
-            print(f"Poids total: {current_weight:.1f} kg / {max_weight} kg")
-            print(f"Capacité restante: {remaining:.1f} kg")
+            print(f"Poids total : {current_weight:.1f} kg / {max_weight} kg")
+            print(f"Capacité restante : {remaining:.1f} kg")
             print("="*50 + "\n")
         
         return True
@@ -374,6 +374,10 @@ class Actions:
             return
 
         beamer = player.inventory["beamer"]
+
+        if getattr(beamer, "fixed_destination", False):
+            print("\nCe beamer est déjà programmé pour une destination précise.\n")
+            return
 
         # Enregistrer la salle actuelle
         beamer.saved_room = player.current_room
@@ -433,7 +437,7 @@ class Actions:
             print("   Utilisation: talk <nom_personnage>\n")
             room = game.player.current_room
             if room.characters:
-                print(f"   Personnages disponibles: {', '.join(room.characters.keys())}\n")
+                print(f"   Personnages disponibles : {', '.join(room.characters.keys())}\n")
             return False
         
         character_name = list_of_words[1].strip()
@@ -444,23 +448,30 @@ class Actions:
             print("\n❌ Erreur: Le nom du personnage ne peut pas être vide.\n")
             return False
         
+        # Recherche insensible à la casse
+        found_key = None
+        for key in room.characters.keys():
+            if key.lower() == character_name.lower():
+                found_key = key
+                break
+        
         # Vérifier si le personnage est dans la pièce actuelle
-        if character_name not in room.characters:
+        if not found_key:
             print(f"\n❌ {character_name} n'est pas ici.")
             if room.characters:
-                print(f"   Personnages disponibles: {', '.join(room.characters.keys())}\n")
+                print(f"   Personnages disponibles : {', '.join(room.characters.keys())}\n")
             else:
                 print("   Il n'y a personne à qui parler dans cette pièce.\n")
             return False
         
         # Récupérer le personnage et afficher son message
-        character = room.characters[character_name]
+        character = room.characters[found_key]
         print(f"\n{character.get_msg()}\n")
         
         # Vérifier les objectifs de quête
         try:
             if hasattr(game, 'quest_manager'):
-                game.quest_manager.check_action_objectives("parler", character_name)
+                game.quest_manager.check_action_objectives("parler", found_key)
         except Exception:
             pass
         
@@ -563,13 +574,14 @@ class Actions:
 
     def show_quest(game, list_of_words, number_of_parameters):
         """Afficher les détails d'une quête (commande `quest <titre>`)."""
-        l = len(list_of_words)
-        if l != number_of_parameters + 1:
+        # On accepte plusieurs mots pour le titre, donc on vérifie juste qu'il y a au moins un paramètre
+        if len(list_of_words) < 2:
             command_word = list_of_words[0]
             print(MSG1.format(command_word=command_word))
             return False
 
-        quest_title = list_of_words[1]
+        # Reconstituer le titre avec les espaces
+        quest_title = " ".join(list_of_words[1:])
         try:
             if hasattr(game, 'quest_manager'):
                 game.quest_manager.show_quest_details(quest_title)

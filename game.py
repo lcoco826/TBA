@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Module Game - Moteur principal du jeu d'aventure TBA.
 
@@ -121,7 +122,7 @@ class Game:
         if "stop" not in self.commands:
             stop = Command("stop", " : arrêter le jeu", Actions.quit, 0)
             self.commands["stop"] = stop
-        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O,U,D)", Actions.go, 1)
+        go = Command("go", " <direction> : se déplacer dans une direction cardinale (N, E, S, O, U, D)", Actions.go, 1)
         self.commands["go"] = go
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
         self.commands["look"] = look
@@ -129,19 +130,19 @@ class Game:
         self.commands["back"] = back
 
         # Setup rooms
-        beach = Room("Beach", "une plage de sable blanc. Capitaine, votre équipage a survécu cependant des singes ont volé toutes vos ressources, c'est à vous de découvrir cette île, retrouver vos ressources et trouver votre bonheur !")
+        beach = Room("Beach", "une plage de sable blanc bordée de palmiers, avec des eaux cristallines.")
         self.rooms.append(beach)
         cove = Room("Cove", "une crique isolée, le calme y règne, cela paraît presque étrange...")
         self.rooms.append(cove)
-        forest = Room("Forêt", "une forêt tropicale, dense et humide, attention des plantes carnivores vous attaquent! ")
+        forest = Room("Forêt", "une forêt tropicale, dense et humide, attention aux plantes carnivores ! ")
         self.rooms.append(forest)
-        lagoon = Room("Lagoon", "une lagune, ses eaux turquoises reflétant le ciel et les palmiers.")
+        lagoon = Room("Lagoon", "une lagune dont les eaux turquoises reflètent le ciel et les palmiers.")
         self.rooms.append(lagoon)
-        cliff = Room("Cliff", "une falaise, elle se détache sur l'horizon, comme un mur de pierre.")
+        cliff = Room("Cliff", "une falaise, elle se détache sur l'horizon comme un mur de pierre.")
         self.rooms.append(cliff)
-        volcano = Room("Volcano", "un volcan, majestueux domine l'île, ses flancs noirs et rugueux témoignent des anciennes coulées de lave.")
+        volcano = Room("Volcano", "un volcan majestueux qui domine l'île, ses flancs noirs et rugueux témoignent des anciennes coulées de lave.")
         self.rooms.append(volcano)
-        cave = Room("Cave", "une grotte mystérieuse et sombre se cache derrière la cascade.")
+        cave = Room("Cave", "une grotte mystérieuse et sombre qui se cache sous une montagne.")
         self.rooms.append(cave)
         waterfall = Room("Waterfall", "une cascade qui dévale la falaise avec fracas, projetant des éclats d'eau créant un nuage de brume.")
         self.rooms.append(waterfall)
@@ -150,12 +151,12 @@ class Game:
 
         beach.exits = {"N" : None, "E" : None, "S" : None, "O" : cove, "U" : None, "D": None}
         cove.exits = {"N" : lagoon, "E" : beach, "S" : None, "O" : None, "U" : None, "D": None}
-        forest.exits = {"N" : None, "E" : None, "S" : beach, "O" : lagoon, "U" : None, "D": None}
+        forest.exits = {"N" : None, "E" : None, "S" : None, "O" : None, "U" : None, "D": None}
         lagoon.exits = {"N" : cave, "E" : forest, "S" : cove, "O" : None, "U" : None, "D": None}
         cave.exits = {"N": None, "E" : volcano, "S" : lagoon, "O" : None, "U" : cliff, "D": None}
         cliff.exits = {"N": None, "E" : None, "S": None, "O" : None, "U" : None, "D" : cave}
-        volcano.exits = {"N": None, "E" : None, "S": None, "O" : cave, "U" : waterfall, "D" : forest}
-        waterfall.exits = {"N" : None, "E" : None, "S" : None, "O" : None, "U": None, "D": volcano}
+        volcano.exits = {"N": None, "E" : None, "S": None, "O" : cave, "U" : waterfall, "D" : None}
+        waterfall.exits = {"N" : None, "E" : None, "S" : None, "O" : cliff, "U": None, "D": None}
 
         for room in self.rooms :
             self.valid_directions.update([d for d in room.exits.keys() if room.exits[d] is not None])
@@ -176,52 +177,47 @@ class Game:
 
         #quêtes 
         q_explore = Quest(
-            "Explorer l'île",
-            "Visitez plusieurs lieux importants de l'île.",
-            [f"Visiter {r.name}" for r in (beach, forest, lagoon)],
-            reward="Carte de l'île"
+            "Vivre un rêve",
+            "Visitez les plus beaux lieux de l'île.",
+            [f"Visiter {r.name}" for r in (beach, cove, waterfall, lagoon)],
+            reward="Sac à dos moyen (+5kg)"
         )
         self.quest_manager.add_quest(q_explore)
 
         q_treasure = Quest(
-            "Trouver le trésor",
-            "Retrouvez le trésor caché dans la lagune ou la cascade.",
-            ["prendre tresor", "prendre parchemin"],
-            reward="Trésor"
+            "Chasse aux trésors",
+            "Retrouvez le trésor caché et les barils perdus.",
+            ["prendre trésor", "prendre barils"],
+            reward="Trésor et Vin"
         )
         self.quest_manager.add_quest(q_treasure)
 
-        # Quête pour récupérer les barils (exemple) et activation automatique en entrant sur la falaise
-        q_barils = Quest(
-            "Récupérer les barils",
-            "Récupérez les barils perdus sur la falaise.",
-            ["prendre barils"],
-            reward="Barils de vin"
+        # Quête pour explorer les lieux dangereux (Grotte et Volcan)
+        q_danger = Quest(
+            "Explorer les lieux dangereux",
+            "Explorez la grotte mystérieuse et le volcan majestueux.",
+            [f"Visiter {cave.name}", f"Visiter {volcano.name}"],
+            reward="Équipement d'explorateur"
         )
-        self.quest_manager.add_quest(q_barils)
-
-        # Quête pour explorer la grotte
-        q_cave = Quest(
-            "Explorer la grotte",
-            "Découvrez les mystères cachés dans la grotte.",
-            [f"Visiter {cave.name}"],
-            reward="Lampe torche"
+        self.quest_manager.add_quest(q_danger)
+        
+        q_trade = Quest(
+            "Marchander",
+            "Discutez avec les singes et récupérez les bananes.",
+            ["parler avec Singes", "prendre bananes"],
+            reward="Grand sac à dos (+10kg)"
         )
-        self.quest_manager.add_quest(q_cave)
-
-        # Quête pour le volcan
-        q_volcano = Quest(
-            "Survivre au volcan",
-            "Approchez et survivez aux dangers du volcan.",
-            [f"Visiter {volcano.name}"],
-            reward="Cendre rare"
-        )
-        self.quest_manager.add_quest(q_volcano)
-
-        # NOTE: suppression de l'activation automatique des quêtes.
-        # Les quêtes sont ajoutées au gestionnaire mais ne sont pas activées
-        # automatiquement. L'utilisateur peut découvrir et activer les
-        # quêtes via les commandes `quests` / `quest` / `rewards`.
+        self.quest_manager.add_quest(q_trade)
+        
+        # Activation des quêtes principales
+        self.quest_manager.activate_quest("Vivre un rêve")
+        # self.quest_manager.activate_quest("Chasse aux trésors") # Sera activée par le parchemin
+        
+        # Configuration de l'activation automatique des quêtes secondaires
+        self.auto_activate_map = {
+            "Cave": "Explorer les lieux dangereux",
+            "Volcano": "Marchander"
+        }
 
         # Dans setup(), après les autres commandes :
         look = Command("look", " : regarder autour de soi", Actions.look, 0)
@@ -233,19 +229,28 @@ class Game:
         from item import Item
 
         # Add items to rooms (dans la méthode setup())
-        parchemin = Item("parchemin", "Vous apercevez un morceau de parchemin à côté d'un squelette. Vous pouvez y lire \"Celui qui veut survivre devra faire l\'inverse de ce que dit le crocodile.\"", 0)
+        parchemin = Item("parchemin", "Vous apercevez un morceau de parchemin à côté d'un squelette. Vous pouvez y lire \"Le trésor se trouve à l'extrémité de l'île.\"", 0)
         beach.inventory["parchemin"] = parchemin
 
         bananes = Item("bananes", "Vous trouvez des bananes accrochées aux arbres.", 5)
-        forest.inventory["bananes"] = bananes
+        waterfall.inventory["bananes"] = bananes
 
         barils = Item("barils", "Vous avez retrouvé les barils de vin.", 10)
         cliff.inventory["barils"] = barils
 
-        tresor = Item("tresor", "Vous avez retouvé le trésor.", 10)
-        waterfall.inventory["tresor"] = tresor
+        tresor = Item("trésor", "Vous avez retrouvé le trésor.", 10)
+        waterfall.inventory["trésor"] = tresor
 
-        take = Command("take", " <item> : prendre un objet", Actions.take, 1)
+        # Wrapper pour la commande take afin d'activer la quête via le parchemin
+        def take_wrapper(game, list_of_words, number_of_parameters):
+            result = Actions.take(game, list_of_words, number_of_parameters)
+            if result and len(list_of_words) > 1:
+                item_name = list_of_words[1].strip().lower()
+                if item_name == "parchemin":
+                    game.quest_manager.activate_quest("Chasse aux trésors")
+            return result
+
+        take = Command("take", " <item> : prendre un objet", take_wrapper, 1)
         self.commands["take"] = take
 
         drop = Command("drop", " <item> : déposer un objet", Actions.drop, 1)
@@ -260,8 +265,10 @@ class Game:
         self.commands["fire"] = fire
 
         # Créer et ajouter le beamer dans une pièce
-        beamer = Item("beamer", "un appareil de téléportation mystérieux", 0.5)
+        beamer = Item("beamer", "un appareil de téléportation mystérieux.", 0)
         beamer.is_beamer = True  # Marquer cet objet comme un beamer
+        beamer.saved_room = beach
+        beamer.fixed_destination = True
         cliff.inventory["beamer"] = beamer
         
 
@@ -274,29 +281,29 @@ class Game:
         # Créer des personnages
         perroquet = Character(
             "Jacob",
-            "un perroquet coloré perché sur une branche près de vous, capitaine.",
+            "un perroquet coloré perché sur une branche près de vous.",
             beach,
-            ["Arrr! Bienvenue sur mon île ! Je suis Jacob ! Cherchez le trésor sous la cascade et celui qui veut survivre devra faire l'inverse de ce que dit le crocodile, au revoir et bonne chance !!"]
+            ["Arrr ! Bienvenue sur mon île ! Je suis Jacob ! Les singes vous ont volé mais ils ne représetent pas le réel danger de cette île, vous devez vous méfier du crocodile !!"]
         )
 
         crocodile = Character(
             "Crocodile",
-            "un crocodile géant émergeant de l'eau de la lagune",
+            "un crocodile géant émerge de l'eau de la lagune.",
             lagoon,
-            ["Bonjour pirates...La nature recèle bien des secrets allez vers l'Est avant que je vous dévore MOUAHAHAH !"]
+            ["Bonjour pirates... La nature recèle bien des secrets, allez vers l'Est avant que je ne vous dévore MOUAHAHAH !"]
         )
 
         singe = Character(
             "Singes",
-            "un groupe de singes malicieux",
-            cliff,
-            ["Cette falaise est magnifique, elle serait encore plus belle si vous en tombiez MOUHAHAHA !"]
+            "un groupe de singes malicieux qui semblent affamés.",
+            volcano,
+            ["Des bananes ! Des Bananes !"]
         )  
 
         # Ajouter les personnages aux pièces
         beach.characters["Jacob"] = perroquet
         lagoon.characters["Crocodile"] = crocodile
-        cliff.characters["Singes"] = singe
+        volcano.characters["Singes"] = singe
 
         # Dans setup(), avec les autres commandes
         talk = Command("talk", " <nom> : parler avec un personnage", Actions.talk, 1)
@@ -312,6 +319,9 @@ class Game:
         # Commande pour afficher les récompenses obtenues
         rewards_cmd = Command("rewards", " : afficher les récompenses obtenues", Actions.show_rewards, 0)
         self.commands["rewards"] = rewards_cmd
+        
+        # Vérifier les objectifs de la salle de départ (pour valider "Visiter Beach" immédiatement)
+        self.quest_manager.check_room_objectives(self.player.current_room.name)
 
     def play(self):
         """
@@ -402,7 +412,7 @@ class Game:
             # Vérifier si la direction est valide dans le jeu
             if normalized_direction not in self.valid_directions:
                 print(f"\n❌ Direction '{direction}' invalide dans ce jeu.")
-                print(f"   Directions valides: {', '.join(sorted(self.valid_directions))}\n")
+                print(f"   Directions valides : {', '.join(sorted(self.valid_directions))}\n")
                 return
         
             # Effectuer le déplacement
@@ -411,7 +421,7 @@ class Game:
             try:
                 if moved and getattr(self.player.current_room, 'name', '').strip() == "Forêt":
                     # Texte de défaite plus évocateur
-                    print("\n☠️  Vous pénétrez plus profondément dans la Forêt.")
+                    print("\n☠️ Vous pénétrez plus profondément dans la Forêt.")
                     print("    Des lianes visqueuses surgissent, des fleurs s'ouvrent en un claquement de crocs...")
                     print("    Vous êtes violemment dévoré par les plantes carnivores.")
                     print("    FIN.\n")
@@ -422,18 +432,16 @@ class Game:
             # Vérifier les objectifs liés aux salles
             try:
                 if moved and hasattr(self, 'quest_manager'):
-                    self.quest_manager.check_room_objectives(self.player.current_room.name)
-                    # Activation automatique : vérifier la map et activer la quête correspondante
+                    # 1. D'abord vérifier si une quête doit s'activer ici
                     try:
                         if hasattr(self, 'auto_activate_map'):
                             quest_to_activate = self.auto_activate_map.get(self.player.current_room.name)
                             if quest_to_activate:
-                                activated = self.quest_manager.activate_quest(quest_to_activate)
-                                # Afficher un message clair quand l'activation est automatique
-                                if activated:
-                                    print(f"\n(Automatique) Quête activée : {quest_to_activate}\n")
+                                self.quest_manager.activate_quest(quest_to_activate)
                     except Exception:
                         pass
+                    # 2. Ensuite vérifier les objectifs (maintenant que la quête est active)
+                    self.quest_manager.check_room_objectives(self.player.current_room.name)
             except Exception:
                 pass
         else:
@@ -453,6 +461,7 @@ class Game:
         print(f"{'='*50}")
         print("💡 Entrez 'help' si vous avez besoin d'aide sur les commandes.")
         print(f"{'='*50}\n")
+        print("Capitaine, votre bateau a fait naufrage, fort heureusement, votre équipage a survécu. Cependant, toutes vos ressources ont été volées par des singes. Il vous faura explorer cette île pour retrouver vos ressources et découvrir des trésors !")
         print(self.player.current_room.get_long_description())   
 
 def main():
@@ -465,13 +474,17 @@ def main():
     try:
         if tk is None:
             raise ImportError("Tkinter not available")
-        # Create game and GUI with a default player name for GUI mode
-        game = Game(player_name="Aventurier")
-        game.setup()
+        # Ask for player name before opening GUI
+        player_name = input("Entrez votre nom : ").strip()
+        if not player_name:
+            player_name = "Aventurier"
+        # Create game and GUI with player name
+        game = Game(player_name=player_name)
+
         app = None
         class GameGUI(tk.Tk):
-            IMAGE_WIDTH = 400
-            IMAGE_HEIGHT = 250
+            IMAGE_WIDTH = 700
+            IMAGE_HEIGHT = 450
 
             def __init__(self, game_instance):
                 super().__init__()
@@ -479,73 +492,129 @@ def main():
                 self.title("TBA - Jeu d'aventure")
                 self.protocol("WM_DELETE_WINDOW", self._on_close)
                 self._game_over_shown = False
+                
+                # Sauvegarde de la sortie standard actuelle (le terminal)
+                self.old_stdout = sys.stdout
+                
+                # Configure style
+                self.style = ttk.Style()
+                self.style.theme_use('clam')
                 # Layout
                 self._build_layout()
+                
+                # Redirection de tous les print() vers l'interface graphique
+                sys.stdout = self
+
+                # Initialisation du jeu (après redirection pour éviter les erreurs d'encodage console)
+                self.game.setup()
+
                 # Print welcome in text output
                 self._print_welcome()
 
+            def write(self, text):
+                """Méthode appelée par print() pour écrire du texte."""
+                self.text_output.configure(state="normal")
+                self.text_output.insert("end", text)
+                self.text_output.see("end")
+                self.text_output.configure(state="disabled")
+                self.update_idletasks() # Met à jour l'affichage immédiatement
+
+            def flush(self):
+                """Méthode requise pour la compatibilité avec sys.stdout."""
+                pass
+
             def _build_layout(self):
-                # Configure root grid
-                self.grid_rowconfigure(0, weight=0)
-                self.grid_rowconfigure(1, weight=1)
-                self.grid_rowconfigure(2, weight=0)
-                self.grid_columnconfigure(0, weight=1)
+                # Configure root grid - 2 columns, 2 rows (plus entry row at bottom)
+                self.grid_rowconfigure(0, weight=1)  # Image / Deplacements
+                self.grid_rowconfigure(1, weight=1)  # Console / Commands
+                self.grid_rowconfigure(2, weight=0)  # Entry bar
+                self.grid_columnconfigure(0, weight=1)  # Left column (image + console)
+                self.grid_columnconfigure(1, weight=0)  # Right column (buttons)
 
-                # Top frame: image and buttons
-                top_frame = ttk.Frame(self)
-                top_frame.grid(row=0, column=0, sticky="nsew", padx=6, pady=(6,3))
-                top_frame.grid_columnconfigure(0, weight=0)
-                top_frame.grid_columnconfigure(1, weight=1)
-
-                # Image area
-                image_frame = ttk.Frame(top_frame, width=self.IMAGE_WIDTH, height=self.IMAGE_HEIGHT)
-                image_frame.grid(row=0, column=0, sticky="nw", padx=(0,6))
+                # TOP LEFT: Image area
+                image_frame = ttk.Frame(self)
+                image_frame.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
                 image_frame.grid_propagate(False)
-                self.canvas = tk.Canvas(image_frame, width=self.IMAGE_WIDTH, height=self.IMAGE_HEIGHT, bg="#222")
+                image_frame.config(width=self.IMAGE_WIDTH, height=self.IMAGE_HEIGHT)
+                self.canvas = tk.Canvas(image_frame, width=self.IMAGE_WIDTH, height=self.IMAGE_HEIGHT, bg="#1a1a2e", highlightthickness=0)
                 self.canvas.pack(fill="both", expand=True)
 
-                # Buttons area
-                buttons_frame = ttk.Frame(top_frame)
-                buttons_frame.grid(row=0, column=1, sticky="ne")
+                # TOP RIGHT: Movement buttons
+                move_frame = ttk.LabelFrame(self, text="Déplacements", padding=10)
+                move_frame.grid(row=0, column=1, sticky="nsew", padx=6, pady=6)
+                move_frame.grid_columnconfigure(0, weight=1)
+                move_frame.grid_columnconfigure(1, weight=1)
+                move_frame.grid_rowconfigure(0, weight=1)
+                move_frame.grid_rowconfigure(1, weight=1)
+                move_frame.grid_rowconfigure(2, weight=1)
+                move_frame.grid_rowconfigure(3, weight=1)
+                
+                btn_style = {'font': ('Arial', 10, 'bold'), 'height': 3, 'width': 4, 'bg': '#2196F3', 'fg': 'white', 'activebackground': '#0b7dda'}
+                tk.Button(move_frame, text="N", command=lambda: self._send_command("go N"), **btn_style).grid(row=0, column=0, columnspan=2, sticky="nsew", padx=1, pady=1)
+                tk.Button(move_frame, text="O", command=lambda: self._send_command("go O"), **btn_style).grid(row=1, column=0, sticky="nsew", padx=1, pady=1)
+                tk.Button(move_frame, text="E", command=lambda: self._send_command("go E"), **btn_style).grid(row=1, column=1, sticky="nsew", padx=1, pady=1)
+                tk.Button(move_frame, text="S", command=lambda: self._send_command("go S"), **btn_style).grid(row=2, column=0, columnspan=2, sticky="nsew", padx=1, pady=1)
+                tk.Button(move_frame, text="U", command=lambda: self._send_command("go U"), **btn_style).grid(row=3, column=0, sticky="nsew", padx=1, pady=1)
+                tk.Button(move_frame, text="D", command=lambda: self._send_command("go D"), **btn_style).grid(row=3, column=1, sticky="nsew", padx=1, pady=1)
 
-                # Movement buttons
-                move_frame = ttk.LabelFrame(buttons_frame, text="Déplacements")
-                move_frame.grid(row=0, column=0, sticky="ew", pady=4)
-                tk.Button(move_frame, text="N", command=lambda: self._send_command("go N")).grid(row=0, column=0, columnspan=2)
-                tk.Button(move_frame, text="O", command=lambda: self._send_command("go O")).grid(row=1, column=0)
-                tk.Button(move_frame, text="E", command=lambda: self._send_command("go E")).grid(row=1, column=1)
-                tk.Button(move_frame, text="S", command=lambda: self._send_command("go S")).grid(row=2, column=0, columnspan=2)
+                # BOTTOM LEFT: Terminal output area
+                output_frame = ttk.Frame(self)
+                output_frame.grid(row=1, column=0, sticky="nsew", padx=6, pady=(0,6))
+                output_frame.grid_rowconfigure(0, weight=1)
+                output_frame.grid_columnconfigure(0, weight=1)
+                scrollbar = ttk.Scrollbar(output_frame, orient="vertical")
+                self.text_output = tk.Text(output_frame, wrap="word", yscrollcommand=scrollbar.set, state="disabled", bg="#111", fg="#eee", font=('Arial', 10))
+                scrollbar.config(command=self.text_output.yview)
+                self.text_output.grid(row=0, column=0, sticky="nsew")
+                scrollbar.grid(row=0, column=1, sticky="ns")
 
-                # Command buttons (extra)
-                cmds_frame = ttk.LabelFrame(buttons_frame, text="Actions rapides")
-                cmds_frame.grid(row=1, column=0, sticky="ew", pady=(6,0))
-                row = 0
+                # BOTTOM RIGHT: Command buttons
+                cmds_frame = ttk.LabelFrame(self, text="Actions rapides", padding=10)
+                cmds_frame.grid(row=1, column=1, sticky="nsew", padx=6, pady=(0,6))
+                cmds_frame.grid_columnconfigure(0, weight=1)
+                cmds_frame.grid_rowconfigure(0, weight=1)
+                
+                # Create scrollable frame for commands with 2 columns
+                canvas_cmds = tk.Canvas(cmds_frame, bg="#f0f0f0", highlightthickness=0)
+                scrollable_frame = ttk.Frame(canvas_cmds)
+                win_id = canvas_cmds.create_window((0, 0), window=scrollable_frame, anchor="nw")
+
+                def _update_dims(event):
+                    c_w = event.width if event.widget == canvas_cmds else canvas_cmds.winfo_width()
+                    c_h = event.height if event.widget == canvas_cmds else canvas_cmds.winfo_height()
+                    f_req_h = scrollable_frame.winfo_reqheight()
+                    canvas_cmds.itemconfig(win_id, width=c_w, height=max(c_h, f_req_h))
+                    canvas_cmds.configure(scrollregion=canvas_cmds.bbox("all"))
+
+                scrollable_frame.bind("<Configure>", _update_dims)
+                canvas_cmds.bind("<Configure>", _update_dims)
+                
                 quick_cmds = [
                     ("help", "Aide"), ("look", "Regarder"), ("take ", "Prendre"), ("drop ", "Déposer"),
                     ("check", "Inventaire"), ("back", "Retour"), ("talk ", "Parler"), ("quests", "Quêtes"), ("rewards", "Récompenses"),
                     ("charge", "Charger beamer"), ("fire", "Utiliser beamer"), ("debug", "DEBUG")
                 ]
-                for cmd, label in quick_cmds:
-                    # For commands that require a parameter, open the input entry after sending the base command
+                
+                action_btn_style = {'font': ('Arial', 9, 'bold'), 'height': 3, 'bg': '#4CAF50', 'fg': 'white', 'activebackground': '#45a049'}
+                
+                # Create grid for buttons (3 columns)
+                scrollable_frame.grid_columnconfigure(0, weight=1)
+                scrollable_frame.grid_columnconfigure(1, weight=1)
+                scrollable_frame.grid_columnconfigure(2, weight=1)
+                
+                for idx, (cmd, label) in enumerate(quick_cmds):
                     def make_cmd(c):
                         return lambda: self._send_command(c.strip())
-                    tk.Button(cmds_frame, text=label, command=make_cmd(cmd)).grid(row=row, column=0, sticky="ew", pady=2)
-                    row += 1
+                    row = idx // 3
+                    col = idx % 3
+                    scrollable_frame.grid_rowconfigure(row, weight=1)
+                    tk.Button(scrollable_frame, text=label, command=make_cmd(cmd), **action_btn_style).grid(row=row, column=col, sticky="nsew", padx=1, pady=1)
+                
+                canvas_cmds.grid(row=0, column=0, sticky="nsew")
 
-                # Terminal output area
-                output_frame = ttk.Frame(self)
-                output_frame.grid(row=1, column=0, sticky="nsew", padx=6, pady=3)
-                output_frame.grid_rowconfigure(0, weight=1)
-                output_frame.grid_columnconfigure(0, weight=1)
-                scrollbar = ttk.Scrollbar(output_frame, orient="vertical")
-                self.text_output = tk.Text(output_frame, wrap="word", yscrollcommand=scrollbar.set, state="disabled", bg="#111", fg="#eee")
-                scrollbar.config(command=self.text_output.yview)
-                self.text_output.grid(row=0, column=0, sticky="nsew")
-                scrollbar.grid(row=0, column=1, sticky="ns")
-
-                # Entry area
+                # BOTTOM: Entry area (spans both columns)
                 entry_frame = ttk.Frame(self)
-                entry_frame.grid(row=2, column=0, sticky="ew", padx=6, pady=(3,6))
+                entry_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=6, pady=(3,6))
                 entry_frame.grid_columnconfigure(0, weight=1)
                 self.entry_var = tk.StringVar()
                 self.entry = ttk.Entry(entry_frame, textvariable=self.entry_var)
@@ -554,8 +623,9 @@ def main():
                 self.entry.focus_set()
 
             def _print_welcome(self):
-                self._write_output(f"\nBienvenue {self.game.player.name} dans ce jeu d'aventure !\n")
-                self._write_output("Entrez 'help' si vous avez besoin d'aide.\n")
+                self._write_output(f"\n🎮 Bienvenue {self.game.player.name} dans ce jeu d'aventure !\n")
+                self._write_output("💡 Entrez 'help' si vous avez besoin d'aide.\n")
+                self._write_output("Capitaine, votre bateau a fait naufrage, fort heureusement, votre équipage a survécu. Cependant, toutes vos ressources ont été volées par des singes.\nIl vous faura explorer cette île pour retrouver vos ressources et découvrir des trésors !")
                 self._write_output(self.game.player.current_room.get_long_description())
                 self._update_room_image()
 
@@ -591,13 +661,32 @@ def main():
                 assets_dir = Path(__file__).parent / 'assets'
                 self.canvas.delete("all")
                 image_path = None
+                
+                # 1. Vérifier si une image est explicitement définie
                 if getattr(room, 'image', None):
                     p = assets_dir / room.image
                     if p.exists():
                         image_path = str(p)
+                
+                # 2. Sinon, chercher une image portant le nom de la salle (ex: Beach.png)
+                if not image_path:
+                    for ext in [".png", ".gif"]:
+                        p = assets_dir / f"{room.name}{ext}"
+                        if p.exists():
+                            image_path = str(p)
+                            break
+
                 if image_path:
                     try:
                         img = tk.PhotoImage(file=image_path)
+                        
+                        # Redimensionner l'image si elle est trop grande (méthode native sans PIL)
+                        w, h = img.width(), img.height()
+                        factor = int(max(w / self.IMAGE_WIDTH, h / self.IMAGE_HEIGHT))
+                        
+                        if factor > 1:
+                            img = img.subsample(factor)
+                            
                         # Keep reference
                         self._image_ref = img
                         self.canvas.create_image(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2, image=self._image_ref)
@@ -650,6 +739,7 @@ def main():
                     flash()
 
             def _on_close(self):
+                sys.stdout = self.old_stdout # Restaure la sortie vers le terminal
                 try:
                     self.destroy()
                 except Exception:

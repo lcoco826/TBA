@@ -23,7 +23,7 @@ class Room:
     
     # Return a string describing the room's exits.
     def get_exit_string(self):
-        exit_string = "Sorties: " 
+        exit_string = "Sorties : " 
         for exit in self.exits.keys():
             if self.exits.get(exit) is not None:
                 exit_string += exit + ", "

@@ -46,7 +46,7 @@ class Player:
         self.current_room = None
         self.history = []  # Historique des salles visitées
         self.inventory = {}
-        self.max_weight = 10
+        self.max_weight = 5
         self.rewards = []  # Récompenses obtenues
 
     def move(self, direction):
@@ -76,7 +76,7 @@ class Player:
         next_room = self.current_room.exits.get(direction)
         if next_room is None:
             print(f"\n❌ Aucune porte dans la direction '{direction.upper()}' !")
-            print(f"   Sorties disponibles: {', '.join([d for d in self.current_room.exits.keys() if self.current_room.exits[d] is not None])}\n")
+            print(f"   Sorties disponibles : {', '.join([d for d in self.current_room.exits.keys() if self.current_room.exits[d] is not None])}\n")
             print(self.current_room.get_long_description())
             return False
 
@@ -85,6 +85,11 @@ class Player:
 
         # Déplacer le joueur
         self.current_room = next_room
+
+        # Si on entre dans la forêt (mort immédiate), on n'affiche pas les infos de la salle ni l'historique
+        if self.current_room.name == "Forêt":
+            return True
+
         print(self.current_room.get_long_description())
         history_msg = self.get_history()
         if history_msg:
@@ -175,7 +180,7 @@ class Player:
         msg = "📦 Vous disposez des items suivants :\n"
         for item in self.inventory.values():
             msg += f"    - {item}\n"
-        msg += f"\n💪 Poids: {current_weight:.1f} kg / {self.max_weight} kg (Reste: {remaining:.1f} kg)"
+        msg += f"\n💪 Poids : {current_weight:.1f} kg / {self.max_weight} kg (Reste : {remaining:.1f} kg)"
         return msg
 
     def add_reward(self, reward):
@@ -200,6 +205,13 @@ class Player:
         
         self.rewards.append(reward)
         print(f"\n🎁 Vous avez reçu : {reward}\n")
+        
+        if "Sac à dos moyen" in reward:
+            self.max_weight += 5
+            print(f"💪 Votre capacité d'inventaire augmente de 5kg ! (Total: {self.max_weight}kg)")
+        elif "Grand sac à dos" in reward:
+            self.max_weight += 10
+            print(f"💪 Votre capacité d'inventaire augmente de 10kg ! (Total: {self.max_weight}kg)")
 
     def get_rewards(self):
         """
