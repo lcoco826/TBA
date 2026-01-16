@@ -606,6 +606,8 @@ def main():
                 
                 for idx, (cmd, label) in enumerate(quick_cmds):
                     def make_cmd(c):
+                        if c.endswith(" "):
+                            return lambda: self._fill_entry(c)
                         return lambda: self._send_command(c.strip())
                     row = idx // 3
                     col = idx % 3
@@ -642,6 +644,12 @@ def main():
                 if value:
                     self._send_command(value)
                     self.entry_var.set("")
+
+            def _fill_entry(self, text):
+                self.entry.delete(0, "end")
+                self.entry.insert(0, text)
+                self.entry.focus_set()
+                self.entry.icursor("end")
 
             def _send_command(self, command):
                 if self.game.finished:
