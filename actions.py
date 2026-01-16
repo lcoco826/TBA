@@ -429,7 +429,8 @@ class Actions:
         if player.current_room.name == "Beach":
             print("\nVous voilà de retour à la plage, Jacob semble vouloir parler.\n")
             if "Jacob" in player.current_room.characters:
-                player.current_room.characters["Jacob"].msgs = ["Capitaine, vous et votre équipage avez réussi ! Vous pouvez reprendre la barre, d'autres aventures vous attendent..."]
+                player.current_room.characters["Jacob"].msgs = ["Capitaine, vous et votre équipage avez réussi ! Êtes-vous prêt à repartir ? (oui/non)"]
+                player.endgame_ready = True
         else:
             print("\nVous êtes téléporté !\n")
             
@@ -694,3 +695,25 @@ class Actions:
         except Exception as e:
             print(f"\nErreur lors de l'affichage des récompenses: {e}\n")
             return False
+
+    def yes(game, list_of_words, number_of_parameters):
+        """Répondre 'oui' à une question."""
+        player = game.player
+        # Vérifier si on est en fin de jeu avec Jacob
+        if getattr(player, "endgame_ready", False) and player.current_room.name == "Beach":
+             print("\nJacob hoche la tête. Vous levez l'ancre et naviguez vers de nouvelles aventures !")
+             game.victory = True
+             game.finished = True
+             return True
+        print("\nIl n'y a rien à confirmer ici.\n")
+        return False
+
+    def no(game, list_of_words, number_of_parameters):
+        """Répondre 'non' à une question."""
+        player = game.player
+        # Vérifier si on est en fin de jeu avec Jacob
+        if getattr(player, "endgame_ready", False) and player.current_room.name == "Beach":
+             print("\nJacob dit : 'Très bien, vous n'avez qu'à revenir me voir quand vous voudrez partir.'\n")
+             return True
+        print("\nIl n'y a rien à refuser ici.\n")
+        return False

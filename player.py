@@ -48,6 +48,7 @@ class Player:
         self.inventory = {}
         self.max_weight = 5
         self.rewards = []  # Récompenses obtenues
+        self.endgame_ready = False
 
     def move(self, direction):
         """

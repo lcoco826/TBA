@@ -97,6 +97,7 @@ class Game:
         self.player = None
         self.player_name = player_name  # Nom optionnel du joueur
         self.valid_directions = set()
+        self.victory = False
         
     def setup(self):
         """
@@ -268,6 +269,10 @@ class Game:
         fire = Command("fire", " : utiliser le beamer", Actions.fire, 0)
         self.commands["fire"] = fire
 
+        oui = Command("oui", " : répondre oui", Actions.yes, 0)
+        self.commands["oui"] = oui
+        non = Command("non", " : répondre non", Actions.no, 0)
+        self.commands["non"] = non
         
 
         # Après la section "Create exits for rooms"
@@ -734,16 +739,22 @@ def main():
                     # Simple flashing red animation with final text
                     steps = 6
                     def flash(step=0):
-                        color = "#600" if step % 2 == 0 else "#300"
+                        if getattr(self.game, 'victory', False):
+                            color = "#2E7D32" if step % 2 == 0 else "#1B5E20" # Vert pour la victoire
+                            text_main = "VOUS AVEZ GAGNÉ !"
+                        else:
+                            color = "#600" if step % 2 == 0 else "#300" # Rouge pour la défaite
+                            text_main = "VOUS AVEZ ÉTÉ DÉVORÉ"
+
                         self.canvas.delete("all")
                         self.canvas.create_rectangle(0, 0, self.IMAGE_WIDTH, self.IMAGE_HEIGHT, fill=color)
-                        self.canvas.create_text(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2 - 10, text="VOUS AVEZ ÉTÉ DÉVORÉ", fill="white", font=("Helvetica", 16, "bold"))
+                        self.canvas.create_text(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2 - 10, text=text_main, fill="white", font=("Helvetica", 16, "bold"))
                         self.canvas.create_text(self.IMAGE_WIDTH/2, self.IMAGE_HEIGHT/2 + 30, text="FIN", fill="white", font=("Helvetica", 14))
                         if step < steps:
                             self.after(300, lambda: flash(step+1))
                         else:
                             # keep final frame and write to output console
-                            self._write_output("\n--- VOUS AVEZ ÉTÉ DÉVORÉ. PARTIE TERMINÉE ---\n")
+                            self._write_output(f"\n--- {text_main}. PARTIE TERMINÉE ---\n")
                     flash()
 
             def _on_close(self):
