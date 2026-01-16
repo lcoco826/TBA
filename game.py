@@ -265,8 +265,6 @@ class Game:
         check = Command("check", " : vérifier l'inventaire", Actions.check, 0)
         self.commands["check"] = check
 
-        charge = Command("charge", " : charger le beamer", Actions.charge, 0)
-        self.commands["charge"] = charge
         fire = Command("fire", " : utiliser le beamer", Actions.fire, 0)
         self.commands["fire"] = fire
 
@@ -593,8 +591,8 @@ def main():
                 
                 quick_cmds = [
                     ("help", "Aide"), ("look", "Regarder"), ("take ", "Prendre"), ("drop ", "Déposer"),
-                    ("check", "Inventaire"), ("back", "Retour"), ("talk ", "Parler"), ("quests", "Quêtes"), ("rewards", "Récompenses"),
-                    ("charge", "Charger beamer"), ("fire", "Utiliser beamer"), ("debug", "DEBUG")
+                    ("check", "Inventaire"), ("back", "Retour"), ("talk ", "Parler"), ("quests", "Quêtes"), ("quest ", "Détails quête"), ("rewards", "Récompenses"),
+                    ("fire", "Utiliser beamer"), ("debug", "DEBUG")
                 ]
                 
                 action_btn_style = {'font': ('Arial', 9, 'bold'), 'height': 3, 'bg': '#4CAF50', 'fg': 'white', 'activebackground': '#45a049'}

@@ -596,7 +596,7 @@ class QuestManager:
         True
         """
         for quest in self.quests:
-            if quest.title == title:
+            if quest.title.lower() == title.lower():
                 return quest
         return None
 
