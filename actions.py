@@ -312,6 +312,26 @@ class Actions:
         del game.player.inventory[found_item]
         
         print(f"\n✅ Vous avez déposé l'objet '{found_item}'.\n")
+        
+        # Interaction spécifique : Bananes -> Singes (via drop)
+        if found_item == "bananes" and "Singes" in game.player.current_room.characters:
+            print("Les singes se précipitent sur les bananes que vous avez laissées tomber !")
+            print("Singes disent : 'Merci, tu peux désormais continuer ton aventure.'\n")
+            
+            # Mettre à jour le message des singes
+            game.player.current_room.characters["Singes"].msgs = ["Merci, tu peux désormais continuer ton aventure."]
+
+            # Les singes prennent les bananes (on les retire du sol)
+            if found_item in game.player.current_room.inventory:
+                del game.player.current_room.inventory[found_item]
+            
+            # Valider l'objectif de quête "donner bananes"
+            try:
+                if hasattr(game, 'quest_manager'):
+                    game.quest_manager.check_action_objectives("donner", found_item)
+            except Exception:
+                pass
+
         return True
 
     def check(game, list_of_words, number_of_parameters):
@@ -475,6 +495,62 @@ class Actions:
         except Exception:
             pass
         
+        return True
+
+    def give(game, list_of_words, number_of_parameters):
+        """
+        Donner un objet à un personnage.
+        
+        Paramètres:
+            game (Game): L'instance du jeu
+            list_of_words (list): ["give", nom_item]
+            number_of_parameters (int): 1
+        """
+        # Validation du nombre de paramètres
+        if len(list_of_words) < 2:
+            print("\n❌ Erreur: Donner quoi ?")
+            print("   Utilisation: give <nom_item>\n")
+            return False
+        
+        item_name = list_of_words[1].strip().lower()
+        
+        # Vérifier si l'item existe dans l'inventaire
+        found_item = None
+        for key in game.player.inventory:
+            if key.lower() == item_name:
+                found_item = key
+                break
+        
+        if not found_item:
+            print(f"\n❌ Vous n'avez pas de '{item_name}' dans votre inventaire.\n")
+            return False
+            
+        # Vérifier s'il y a un personnage dans la pièce
+        room = game.player.current_room
+        if not room.characters:
+            print("\n❌ Il n'y a personne à qui donner cela ici.\n")
+            return False
+            
+        # Récupérer le premier personnage (simplification)
+        target_char = list(room.characters.values())[0]
+        
+        # Retirer l'item de l'inventaire
+        item = game.player.inventory.pop(found_item)
+        
+        print(f"\n✅ Vous donnez '{found_item}' à {target_char.name}.\n")
+        
+        # Interaction spécifique : Bananes -> Singes
+        if found_item == "bananes" and target_char.name == "Singes":
+            print(f"{target_char.name} disent : 'Merci, tu peux désormais continuer ton aventure.'\n")
+            target_char.msgs = ["Merci, tu peux désormais continuer ton aventure."]
+        
+        # Vérifier les objectifs de quête
+        try:
+            if hasattr(game, 'quest_manager'):
+                game.quest_manager.check_action_objectives("donner", found_item)
+        except Exception:
+            pass
+            
         return True
 
     def debug(game, list_of_words, number_of_parameters):

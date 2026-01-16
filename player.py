@@ -212,6 +212,16 @@ class Player:
         elif "Grand sac à dos" in reward:
             self.max_weight += 10
             print(f"💪 Votre capacité d'inventaire augmente de 10kg ! (Total: {self.max_weight}kg)")
+        
+        if "Beamer" in reward:
+            from item import Item
+            beamer = Item("beamer", "un appareil de téléportation mystérieux.", 0)
+            beamer.is_beamer = True
+            if hasattr(self, 'starting_room'):
+                beamer.saved_room = self.starting_room
+                beamer.fixed_destination = True
+            self.inventory["beamer"] = beamer
+            print("✨ Vous obtenez le Beamer ! Il vous ramènera toujours au point de départ.")
 
     def get_rewards(self):
         """

@@ -35,8 +35,8 @@ class Character:
     
     def get_msg(self):
         """
-        Retourne et supprime le premier message du personnage.
-        Affiche cycliquement les messages (les supprime au fur et à mesure).
+        Retourne le message du personnage.
+        Affiche cycliquement les messages.
         
         Returns:
             str: Le message du personnage
@@ -45,8 +45,9 @@ class Character:
         if not self.msgs:
             return f"{self.name} n'a rien d'autre à dire."
         
-        # Retirer et retourner le premier message
+        # Retirer le premier message et le remettre à la fin (rotation)
         msg = self.msgs.pop(0)
+        self.msgs.append(msg)
         return f"{self.name} dit : '{msg}'"
     
     def move(self):

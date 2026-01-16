@@ -171,6 +171,7 @@ class Game:
         
         self.player = Player(player_name)
         self.player.current_room = beach
+        self.player.starting_room = beach
 
         # Initialise le gestionnaire de quêtes pour ce joueur
         self.quest_manager = QuestManager(self.player)
@@ -188,7 +189,7 @@ class Game:
             "Chasse aux trésors",
             "Retrouvez le trésor caché et les barils perdus.",
             ["prendre trésor", "prendre barils"],
-            reward="Trésor et Vin"
+            reward="Trésor, Vin et Beamer"
         )
         self.quest_manager.add_quest(q_treasure)
 
@@ -203,8 +204,8 @@ class Game:
         
         q_trade = Quest(
             "Marchander",
-            "Discutez avec les singes et récupérez les bananes.",
-            ["parler avec Singes", "prendre bananes"],
+            "Discutez avec les singes, récupérez les bananes et donnez-leur.",
+            ["parler avec Singes", "prendre bananes", "donner bananes"],
             reward="Grand sac à dos (+10kg)"
         )
         self.quest_manager.add_quest(q_trade)
@@ -236,18 +237,23 @@ class Game:
         waterfall.inventory["bananes"] = bananes
 
         barils = Item("barils", "Vous avez retrouvé les barils de vin.", 10)
-        cliff.inventory["barils"] = barils
+        waterfall.inventory["barils"] = barils
 
         tresor = Item("trésor", "Vous avez retrouvé le trésor.", 10)
-        waterfall.inventory["trésor"] = tresor
+        cliff.inventory["trésor"] = tresor
 
         # Wrapper pour la commande take afin d'activer la quête via le parchemin
         def take_wrapper(game, list_of_words, number_of_parameters):
             result = Actions.take(game, list_of_words, number_of_parameters)
             if result and len(list_of_words) > 1:
                 item_name = list_of_words[1].strip().lower()
-                if item_name == "parchemin":
-                    game.quest_manager.activate_quest("Chasse aux trésors")
+                if item_name in ["parchemin", "trésor", "barils"]:
+                    if game.quest_manager.activate_quest("Chasse aux trésors"):
+                        # Si la quête vient d'être activée, on valide l'objectif rétroactivement pour l'objet pris
+                        for key in game.player.inventory:
+                            if key.lower() == item_name:
+                                game.quest_manager.check_action_objectives("prendre", key)
+                                break
             return result
 
         take = Command("take", " <item> : prendre un objet", take_wrapper, 1)
@@ -264,12 +270,6 @@ class Game:
         fire = Command("fire", " : utiliser le beamer", Actions.fire, 0)
         self.commands["fire"] = fire
 
-        # Créer et ajouter le beamer dans une pièce
-        beamer = Item("beamer", "un appareil de téléportation mystérieux.", 0)
-        beamer.is_beamer = True  # Marquer cet objet comme un beamer
-        beamer.saved_room = beach
-        beamer.fixed_destination = True
-        cliff.inventory["beamer"] = beamer
         
 
         # Après la section "Create exits for rooms"
@@ -308,6 +308,8 @@ class Game:
         # Dans setup(), avec les autres commandes
         talk = Command("talk", " <nom> : parler avec un personnage", Actions.talk, 1)
         self.commands["talk"] = talk
+        give = Command("give", " <item> : donner un objet à un personnage", Actions.give, 1)
+        self.commands["give"] = give
         # Commande debug pour basculer le mode debug à l'exécution
         debug_cmd = Command("debug", " : basculer le mode debug (affiche les messages DEBUG)", Actions.debug, 0)
         self.commands["debug"] = debug_cmd
