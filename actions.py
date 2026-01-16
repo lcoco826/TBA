@@ -425,7 +425,14 @@ class Actions:
 
         # Téléportation
         player.current_room = beamer.saved_room
-        print("\nVous êtes téléporté !\n")
+        
+        if player.current_room.name == "Beach":
+            print("\nVous voilà de retour à la plage, Jacob semble vouloir parler.\n")
+            if "Jacob" in player.current_room.characters:
+                player.current_room.characters["Jacob"].msgs = ["Capitaine, vous et votre équipage avez réussi ! Vous pouvez reprendre la barre, d'autres aventures vous attendent..."]
+        else:
+            print("\nVous êtes téléporté !\n")
+            
         print(player.current_room.get_long_description())
         try:
             if hasattr(game, 'quest_manager'):
