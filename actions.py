@@ -114,6 +114,40 @@ class Actions:
         game.finished = True
         return True
 
+    def restart(game, list_of_words, number_of_parameters):
+        """
+        Recommencer le jeu depuis le début.
+        
+        Paramètres:
+            game (Game): L'instance du jeu
+            list_of_words (list): ["restart"]
+            number_of_parameters (int): 0
+        """
+        l = len(list_of_words)
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+            
+        print("\n🔄 Redémarrage du jeu...\n")
+        
+        # Réinitialisation complète de l'état du jeu
+        game.rooms = []
+        game.commands = {}
+        game.valid_directions = set()
+        game.player = None
+        game.quest_manager = None
+        game.finished = False
+        game.victory = False
+        
+        # Relancer la configuration
+        game.setup()
+        
+        # Afficher le message de bienvenue
+        game.print_welcome()
+        
+        return True
+
     def help(game, list_of_words, number_of_parameters):
         """
         Afficher l'aide et la liste des commandes disponibles.

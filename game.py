@@ -119,6 +119,8 @@ class Game:
         self.commands["help"] = help
         quit = Command("quit", " : quitter le jeu", Actions.quit, 0)
         self.commands["quit"] = quit
+        restart = Command("restart", " : recommencer le jeu", Actions.restart, 0)
+        self.commands["restart"] = restart
         # Alias/commande supplémentaire pour arrêter le jeu si souhaité
         if "stop" not in self.commands:
             stop = Command("stop", " : arrêter le jeu", Actions.quit, 0)
@@ -607,6 +609,7 @@ def main():
                 scrollable_frame.grid_columnconfigure(1, weight=1)
                 scrollable_frame.grid_columnconfigure(2, weight=1)
                 
+                row = 0
                 for idx, (cmd, label) in enumerate(quick_cmds):
                     def make_cmd(c):
                         if c.endswith(" "):
@@ -616,6 +619,9 @@ def main():
                     col = idx % 3
                     scrollable_frame.grid_rowconfigure(row, weight=1)
                     tk.Button(scrollable_frame, text=label, command=make_cmd(cmd), **action_btn_style).grid(row=row, column=col, sticky="nsew", padx=1, pady=1)
+                
+                # Bouton Recommencer sur toute la largeur
+                tk.Button(scrollable_frame, text="Recommencer", command=lambda: self._send_command("restart"), **action_btn_style).grid(row=row+1, column=0, columnspan=3, sticky="nsew", padx=1, pady=1)
                 
                 canvas_cmds.grid(row=0, column=0, sticky="nsew")
 
@@ -655,12 +661,21 @@ def main():
                 self.entry.icursor("end")
 
             def _send_command(self, command):
-                if self.game.finished:
+                # Si le jeu est fini, seule la commande 'restart' est autorisée
+                if self.game.finished and command.strip().lower() != "restart":
                     return
                 # Echo the command in output area
                 self._write_output(f"> {command}")
                 # Process command
                 self.game.process_command(command)
+                
+                # Si on vient de redémarrer, on réactive l'interface
+                if command.strip().lower() == "restart":
+                    self.entry.configure(state="normal")
+                    self._game_over_shown = False
+                    self._update_room_image()
+                    return
+
                 # Update room image and output
                 self._update_room_image()
                 if self.game.finished:
