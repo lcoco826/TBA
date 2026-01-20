@@ -137,7 +137,7 @@ class Game:
         self.rooms.append(beach)
         cove = Room("Cove", "une crique isolée, le calme y règne, cela paraît presque étrange...")
         self.rooms.append(cove)
-        forest = Room("Forêt", "une forêt tropicale, dense et humide, attention aux plantes carnivores ! ")
+        forest = Room("Forêt", "une forêt tropicale, dense et humide, attention aux crocodiles ! ")
         self.rooms.append(forest)
         lagoon = Room("Lagoon", "une lagune dont les eaux turquoises reflètent le ciel et les palmiers.")
         self.rooms.append(lagoon)
@@ -429,8 +429,8 @@ class Game:
                 if moved and getattr(self.player.current_room, 'name', '').strip() == "Forêt":
                     # Texte de défaite plus évocateur
                     print("\n☠️ Vous pénétrez plus profondément dans la Forêt.")
-                    print("    Des lianes visqueuses surgissent, des fleurs s'ouvrent en un claquement de crocs...")
-                    print("    Vous êtes violemment dévoré par les plantes carnivores.")
+                    print("    Soudain, des yeux jaunes brillent dans l'ombre...")
+                    print("    Vous êtes violemment dévoré par des crocodiles affamés.")
                     print("    FIN.\n")
                     self.finished = True
                     return
