@@ -1,8 +1,24 @@
-# Define the Room class.
+# pylint: disable=cyclic-import
+"""
+Module Room - Gère les lieux du jeu.
+
+Ce module contient la classe Room qui représente un lieu dans le jeu.
+"""
 
 class Room:
+    """
+    Représente un lieu (salle) dans le jeu.
 
-    # Define the constructor. 
+    Attributs:
+        name (str): Le nom du lieu.
+        description (str): La description du lieu.
+        image (str): Chemin vers l'image du lieu (optionnel).
+        exits (dict): Les sorties vers d'autres lieux.
+        inventory (dict): Les objets présents dans le lieu.
+        characters (dict): Les personnages présents dans le lieu.
+    """
+
+    # Define the constructor.
     def __init__(self, name, description, image=None):
         self.name = name
         self.description = description
@@ -12,21 +28,26 @@ class Room:
         self.inventory = {}
         self.characters = {}
 
-    # Define the get_exit method.
     def get_exit(self, direction):
+        """
+        Retourne la pièce dans la direction donnée si elle existe.
 
-        # Return the room in the given direction if it exists.
-        if direction in self.exits.keys():
+        Args:
+            direction (str): La direction vers laquelle aller.
+
+        Returns:
+            Room: La pièce correspondante ou None.
+        """
+        if direction in self.exits:
             return self.exits[direction]
-        else:
-            return None
-    
-    # Return a string describing the room's exits.
+        return None
+
     def get_exit_string(self):
-        exit_string = "Sorties : " 
-        for exit in self.exits.keys():
-            if self.exits.get(exit) is not None:
-                exit_string += exit + ", "
+        """Retourne une chaîne décrivant les sorties de la pièce."""
+        exit_string = "Sorties : "
+        for direction in self.exits:
+            if self.exits.get(direction) is not None:
+                exit_string += direction + ", "
         exit_string = exit_string.strip(", ")
         return exit_string
 
@@ -60,7 +81,7 @@ class Room:
             # avec attributs `name`, `description`, `weight`.
             try:
                 msg += f"    - {item.name} : {item.description} ({item.weight} kg)\n"
-            except Exception:
+            except AttributeError:
                 # Fallback si l'item est juste une chaîne
                 msg += f"    - {item}\n"
 
@@ -69,5 +90,3 @@ class Room:
             msg += f"    - {character}\n"
 
         return msg
-
-    

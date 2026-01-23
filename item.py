@@ -1,7 +1,10 @@
-# Description: Item class
+"""
+Module Item - Gère les objets du jeu.
+"""
 
 class Item:
-
+    """Représente un objet dans le jeu."""
+    # pylint: disable=too-few-public-methods
     def __init__(self, name, description, weight):
         """
         Constructeur de la classe Item.
@@ -25,4 +28,3 @@ class Item:
         Returns: Une chaîne formatée avec le nom, la description et le poids
         """
         return f"{self.name} : {self.description} ({self.weight} kg)"
-

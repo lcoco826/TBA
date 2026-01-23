@@ -11,6 +11,19 @@ Le jeu comporte **8 lieux**, des **objets** (items), des **PNJ** et des **quête
 **PNJ** : Interaction avec des personnages (Jacob le perroquet, le Crocodile, les Singes).
 **Quêtes** : Système d'objectifs à accomplir pour gagner des récompenses.
 **Interface** : Fenêtre graphique avec boutons de déplacement, images des lieux et zone de texte.
+**Téléportation** : Utilisation du Beamer pour voyager rapidement.
+
+## Commandes
+
+- `go <direction>` : Se déplacer (N, E, S, O, U, D).
+- `look` : Regarder autour de soi.
+- `take <objet>` / `drop <objet>` : Prendre ou déposer un objet.
+- `check` : Afficher l'inventaire.
+- `talk <personnage>` : Discuter avec un PNJ.
+- `give <objet>` : Donner un objet à un PNJ.
+- `quests` : Afficher le journal de quêtes.
+- `fire` : Utiliser le Beamer.
+- `back` : Revenir à la salle précédente.
 
 ## Structuration
 
